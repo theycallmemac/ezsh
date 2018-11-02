@@ -3,8 +3,8 @@
 ### Section A:
 
 - __Project Title:__ ezsh (EasyShell)
-- __Student 1 Name:__ James McDermott
-- __Student 2 Name:__ Connor Mulready
+- __Student 1 Name:__ James McDermott (__ID:__ 15398841)
+- __Student 2 Name:__ Connor Mulready (__ID:__ 16302381)
 - __Staff Member Consulted:__ Stephen Blott
 
 #### Project Description:
