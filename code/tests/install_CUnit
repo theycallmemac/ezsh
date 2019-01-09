@@ -1,0 +1,5 @@
+wget https://github.com/danfis/cu/archive/master.zip
+unzip master.zip
+rm master.zip
+mv cu-master cu
+make -C cu
