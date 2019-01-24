@@ -1,9 +1,25 @@
 #include <stdlib.h>
 #include <signal.h>
-
+#include "utils/colour.h"
 #include "utils/readline.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
+
+void ezshPrompt(char uname[], char cwd[], char hostname[]) {
+    printf("╭─ ");
+    bold_magenta();
+    printf("%s ", uname);
+    reset();
+    printf("%s " , "at");
+    bold_cyan();
+    printf("%s " , hostname);
+    reset();
+    printf("%s " , "in");
+    bold_green();
+    printf("%s\n", cwd);
+    reset();
+    printf("╰ ");
+}
 
 void ezshLoop(void) {
     // declare variables needed
@@ -12,14 +28,18 @@ void ezshLoop(void) {
     int status;
     
     do {
-        // this is our prompt here
-        // this sets a size of 1024 for the current workind directory
+        // this sets a size of 1024 for the current working directory
         char cwd[1024];
+        // sets size of 1024 for hostname
+        char hostname[1024];
+        // get size of hostname and load into variable
+        gethostname(hostname, 1024);
         // load size of cwd into cwd
         getcwd(cwd, sizeof(cwd));
+        // get logged in user
         char* uname = getlogin();
-        // use it in the prompt
-        printf("%s: %s |---> ", uname, cwd);
+        // pass info to function which handles prompt design
+        ezshPrompt(uname, cwd, hostname); 
         // call the readline function
         line = ezshReadLine();
         // split line into arguments
@@ -30,7 +50,7 @@ void ezshLoop(void) {
         free(args);
     } while (status); 
     // the do while loop allows checking of the current status variable 
-    //returned from ezsh_execute function
+    // returned from ezsh_execute function
 }
 
 static volatile int keepRunning = 1;
