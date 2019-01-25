@@ -6,5 +6,5 @@ prompt:
     script:
         - cd code/tests
         - make
-        - ./runTests
+        - ./test
         - make clean
