@@ -1,0 +1,10 @@
+before_script:
+    - chmod +x code/tests/install_cUnit
+    - code/tests/install_cUnit
+
+prompt:
+    script:
+        - cd code/tests
+        - make
+        - ./runTests
+        - make clean
