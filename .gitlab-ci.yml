@@ -5,6 +5,7 @@ before_script:
 prompt:
     script:
         - cd code/tests
+        - ls 
         - make
         - ./test
         - make clean
