@@ -1,6 +1,6 @@
 before_script:
-    - chmod +x code/tests/install_cUnit
-    - code/tests/install_cUnit
+    - chmod +x code/tests/install_CUnit
+    - ./code/tests/install_CUnit
 
 prompt:
     script:
