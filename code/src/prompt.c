@@ -1,14 +1,12 @@
 #include <stdlib.h>
 #include <signal.h>
-
+#include <stdio.h> 
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "utils/colour.h"
-#include "utils/readline.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
-
 
 
 char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
@@ -46,7 +44,7 @@ void ezshLoop(void) {
         // get logged in user
         char* uname = getlogin();
         // pass info to function which handles prompt design
-        // call the readline function
+        // call the readline function, which takes the ezshPrompt function as a parameter
         line = readline(ezshPrompt(uname, cwd, hostname));
         //line = ezshReadLine(input);
         add_history(line);
@@ -63,9 +61,23 @@ void ezshLoop(void) {
 
 static volatile int keepRunning = 1;
 
-int main() {
+void handler(int sig) {
+    printf("\n");
+    char cwd[1024];
+    // sets size of 1024 for hostname
+    char hostname[1024];
+    // get size of hostname and load into variable
+    gethostname(hostname, 1024);
+    // load size of cwd into cwd
+    getcwd(cwd, sizeof(cwd));
+    // get logged in user
+    char* uname = getlogin();
+    ezshPrompt(uname,cwd, hostname);
+}
+
+int main(int argc, char **argv) {
     // the above paramters load configs if they exist
-    // loop to run commands
+    signal(SIGINT, handler);
     rl_bind_key('\t', rl_complete);
     while (keepRunning) {
         ezshLoop();
