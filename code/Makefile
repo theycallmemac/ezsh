@@ -4,15 +4,23 @@ PROMPT_OBJ = $(PROMPT_SRC:.c=.o)
 
 PROMPT = prompt
 
-CFLAGS = -W -Wall -Wextra -Wc99-c11-compat -pedantic -std=c99
+EXP_SRC = src/explorer.c
 
-all:	$(PROMPT) $(SERVER)
+EXP_OBJ = $(EXP_SRC:.c=.o)
+
+EXP = exp
+
+
+all:	$(PROMPT) $(EXP)
 
 $(PROMPT): $(PROMPT_OBJ)
-		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline
+		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
+
+$(EXP): $(EXP_OBJ)
+		gcc -o $(EXP) $(EXP_OBJ)
 
 clean:
-		rm $(PROMPT_OBJ) $(SERVER_OBJ)
+		rm $(PROMPT) $(EXP) $(PROMPT_OBJ) $(EXP_OBJ)
 
 .PHONY: all clean
 
