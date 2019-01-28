@@ -1,0 +1,52 @@
+#!/bin/bash
+
+make
+
+for f in {$PWD,$HOME}/.ezsh/.ezsh.conf; do
+  test -f $f && layout=$f && break
+done
+
+if [[ ! -f $layout ]]; then
+  echo "No $PWD/.ezsh/.ezsh.conf nor $HOME/.ezsh/.ezsh.conf found."
+  exit 1
+fi
+
+session=${1:-$(basename $PWD | tr . -)}
+
+if [[ -z $(tmux ls -F "#{session_name}" 2>/dev/null | grep "^$session$") ]]; then
+  tmux $TMUX_OPTS new-session -s $session -d
+else
+  tmux $TMUX_OPTS attach -t $session
+  exit 0
+fi
+
+while read window pane command; do
+  
+  [ -z "$window" -o -z "$pane" -o -z "$command" ] && continue
+  pane_number=${pane//[^0-9]*}
+  active=${pane//[^*]}
+
+  if [[ -n $active ]]; then
+    active_window=$window
+    active_pane=$pane_number
+  fi
+
+  if [[ -z $(tmux list-windows -t $session  -F "#{window_name}" | grep "^${window}$") ]]; then
+    tmux new-window -a -t $session -n $window -c $PWD
+  fi
+
+  if [[ -z $(tmux list-panes -t $session:$window  -F "#{pane_index}" | grep "^${pane_number}$") ]]; then
+    tmux split-window -h -t $session:$window
+  fi
+
+  tmux send-keys -t $session:$window.$pane_number "$command" C-m
+done < $layout
+
+tmux kill-window -t $session:$( tmux list-windows -t $session -F "#{window_index}" | head -n 1 )
+
+tmux select-window -t $session:$active_window
+
+tmux select-pane -t $session:$active_window.$active_pane
+
+tmux $TMUX_OPTS attach-session -t $session
+
