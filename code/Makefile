@@ -4,24 +4,23 @@ PROMPT_OBJ = $(PROMPT_SRC:.c=.o)
 
 PROMPT = prompt
 
-SERVER_SRC = src/ezshServer.c
+EXP_SRC = src/explorer.c
 
-SERVER_OBJ = $(SERVER_SRC:.c=.o)
+EXP_OBJ = $(EXP_SRC:.c=.o)
 
-SERVER = server
+EXP = exp
 
-CFLAGS = -W -Wall -Wextra -Wc99-c11-compat -pedantic -std=c99
 
-all:	$(PROMPT) $(SERVER)
+all:	$(PROMPT) $(EXP)
 
 $(PROMPT): $(PROMPT_OBJ)
-		gcc -o $(PROMPT) $(PROMPT_OBJ)
+		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
 
-$(SERVER): $(SERVER_OBJ)
-		gcc -o $(SERVER) $(SERVER_OBJ)
+$(EXP): $(EXP_OBJ)
+		gcc -o $(EXP) $(EXP_OBJ)
 
 clean:
-		rm $(PROMPT_OBJ) $(SERVER_OBJ)
+		rm $(PROMPT) $(EXP) $(PROMPT_OBJ) $(EXP_OBJ)
 
 .PHONY: all clean
 
