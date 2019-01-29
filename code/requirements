@@ -1,4 +1,3 @@
 #!/bin/bash/
 
-sudo apt-get install toilet
-sudo apt-get install tmux
+sudo apt-get install tmux libreadline-dev ibncurses5-dev libncursesw5-dev toilet 

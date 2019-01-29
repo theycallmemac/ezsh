@@ -3,36 +3,46 @@
 #include <unistd.h>
 
 int ezshCD(char **args);
-int ezshHELP();
+int ezshHELP(char **args);
+int ezshOPTIONS(char **args);
 int ezshEXIT();
 
 // some builtins and their functions
 char *builtinStr[] = {
     "cd",
     "help",
+    "options",
     "exit"
 };
 
 int (*builtinFunc[]) (char **) = {
     &ezshCD,
     &ezshHELP,
+    &ezshOPTIONS,
     &ezshEXIT
 };
 
 int ezshNumBuiltins() {
     return sizeof(builtinStr) / sizeof(char *);
 }
-int ezshHELP() {
-    int i;
-    printf("James McDermott & Connor Mulready's ezsh\n");
-    printf("You can type regular commands and their arguments, followed by the return key.\n");
-    printf("The following list of commands are built in to ezsh:\n");
-
-    for (i = 0; i < ezshNumBuiltins(); i++) {
-      printf(" --> %s\n", builtinStr[i]);
+int ezshHELP(char **args) {
+    if (args[1] == NULL) {
+      fprintf(stderr, "ezsh: expected argument to \"help\"\n");
+    } else {
+       char buf[100];
+       snprintf(buf, sizeof(buf), "echo && man %s | grep -A 1 NAME |  sed 's/^[ \t]*//;s/[ \t]*$//' | sed -n '1!p' && echo", args[1]);                                   
+       system(buf); 
     }
-
-    printf("Use the man command for information on other programs.\n");
+    return 0;
+}
+int ezshOPTIONS(char **args) {
+    if (args[1] == NULL) {
+      fprintf(stderr, "ezsh: expected argument to \"options\"\n");
+    } else {
+       char buf[100];
+       snprintf(buf, sizeof(buf), "echo && man %s | grep -A 40 DESCRIPTION |  sed 's/^[ \t]*//;s/[ \t]*$//' | sed -n '1!p' && echo", args[1]);                                   
+       system(buf); 
+    }
     return 0;
 }
 int ezshCD(char **args) {
