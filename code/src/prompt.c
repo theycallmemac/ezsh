@@ -1,13 +1,16 @@
 #include <stdlib.h>
-#include <signal.h>
 #include <stdio.h> 
+#include <signal.h>
+
+#include <sys/types.h>
+#include <pwd.h>
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "utils/colour.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
-
 
 char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
     printf("╭─ ");
