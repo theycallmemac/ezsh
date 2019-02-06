@@ -11,6 +11,7 @@
 #include "utils/colour.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
+#include "utils/systemFiles.h"
 
 char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
     printf("╭─ ");
@@ -50,7 +51,10 @@ void ezshLoop(void) {
         // call the readline function, which takes the ezshPrompt function as a parameter
         line = readline(ezshPrompt(uname, cwd, hostname));
         //line = ezshReadLine(input);
-        add_history(line);
+        //if (strcmp(line, "") == 1) {
+            add_history(line);
+            addToHistory(line);
+        //}
         // split line into arguments
         args = ezshSplitLine(line);
         // return status variable so the code knows when to exit
@@ -65,6 +69,7 @@ void ezshLoop(void) {
 static volatile int keepRunning = 1;
 
 void handler(int sig) {
+    rl_free_line_state ();
     printf("\n");
     char cwd[1024];
     // sets size of 1024 for hostname
@@ -82,6 +87,7 @@ int main(int argc, char **argv) {
     // the above paramters load configs if they exist
     signal(SIGINT, handler);
     rl_bind_key('\t', rl_complete);
+    createFiles();
     while (keepRunning) {
         ezshLoop();
     }

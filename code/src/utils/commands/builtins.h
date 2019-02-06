@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+
+#include "history.h"
 int ezshCD(char **args);
 int ezshHELP(char **args);
 int ezshHISTORY(char **args);
