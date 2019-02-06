@@ -12,7 +12,7 @@
 Input: FILE *ptr, bash command, string[]
 Output: Void, pass by reference  
 */
-void expls(FILE *fp, char * command, char **currdir){
+int expls(FILE *fp, char * command, char **currdir){
 
     char path[1024];
     fp = popen(command, "r");
@@ -20,13 +20,15 @@ void expls(FILE *fp, char * command, char **currdir){
         exit(1);
     }
 
-    int i = 0;
+    int i = 1;
+    strcpy(currdir[0], "..");
     while(fgets(path, sizeof(path)-1, fp) != NULL){
         strcpy(currdir[i],path);
         i++;
     }
     pclose(fp);
     free(fp);
+    return i;
 }
 /* chdir alias
 Input: char* directory
