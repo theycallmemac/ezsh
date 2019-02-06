@@ -3,7 +3,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+
 #include "commands/builtins.h"
+
 int ezshLaunch(char **args) {
     pid_t pid;
     int status;

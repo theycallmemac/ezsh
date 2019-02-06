@@ -3,3 +3,4 @@ unzip master.zip
 rm master.zip
 mv cu-master cu
 make -C cu
+mkdir regressions
