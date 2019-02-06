@@ -8,7 +8,6 @@
 #define MAGENTA "\\33[1;35m"
 #define CYAN  "\\33[1;36m"
 #define GREEN "\\33[1;32m"
-#define YELLOW "\\33[1;33m"
 #define WHITE "\\33[0m"
 
 TEST(test3) {
@@ -27,10 +26,6 @@ TEST(test5) {
 }
 
 TEST(test6) {
-    char *yellow  = bold_yellow();
-    assertEquals(0, strcmp(YELLOW, yellow));
-}
-TEST(test7) {
     char *white  = reset();
     assertEquals(0, strcmp(WHITE, white));
 }
