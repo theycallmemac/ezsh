@@ -6,12 +6,14 @@
 
 int ezshCD(char **args);
 int ezshHELP(char **args);
+int ezshHISTORY(char **args);
 int ezshEXIT();
 
 // some builtins and their functions
 char *builtinStr[] = {
     "cd",
     "help",
+    "history",
     "exit"
 };
 
@@ -19,12 +21,20 @@ char *builtinStr[] = {
 int (*builtinFunc[]) (char **) = {
     &ezshCD,
     &ezshHELP,
+    &ezshHISTORY,
     &ezshEXIT
 };
 
 int ezshNumBuiltins() {
     return sizeof(builtinStr) / sizeof(char *);
 }
+
+int ezshHISTORY(char **args) {
+    showHistory();  
+    return 0;
+}
+
+
 
 int ezshHELP(char **args) {
     if (args[1] == NULL) {
