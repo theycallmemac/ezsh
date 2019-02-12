@@ -13,4 +13,6 @@ explorer:
         - ./testExp
 
 after_script:
+    - code code/tests
+    - rm -r cu/
     - make clean
