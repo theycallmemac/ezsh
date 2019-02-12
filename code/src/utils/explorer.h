@@ -10,7 +10,7 @@
 
 /* 
 Input: FILE *ptr, bash command, string[]
-Output: Void, pass by reference  
+Output: Int, pass by reference & number of elements  
 */
 int expls(FILE *fp, char * command, char **currdir){
 
@@ -19,7 +19,6 @@ int expls(FILE *fp, char * command, char **currdir){
     if (fp == NULL){
         exit(1);
     }
-
     int i = 1;
     strcpy(currdir[0], "..");
     while(fgets(path, sizeof(path)-1, fp) != NULL){
@@ -27,7 +26,6 @@ int expls(FILE *fp, char * command, char **currdir){
         i++;
     }
     pclose(fp);
-    free(fp);
     return i;
 }
 /* chdir alias
