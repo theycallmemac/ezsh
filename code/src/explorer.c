@@ -4,8 +4,6 @@
 #include <string.h>
 #include "./utils/explorer.h"
 
-#define ARRAYSIZE(a) (sizeof(a))/sizeof(a[0])
-
 int main(int argc, char *argv[]) {
     
     FILE *fptr;
@@ -24,7 +22,8 @@ int main(int argc, char *argv[]) {
 
 start:
     /*Allocate memory for currdir*/
-    if (( currdir = malloc( 100*sizeof( char* ))) == NULL){}
+
+    currdir = malloc( 100*sizeof( char* ));
     for (int i = 0; i < 100; i++){
         if ((currdir[i] = malloc(100)) == NULL){
             perror("ezsh");
@@ -37,7 +36,6 @@ start:
     int i = 0;
     
     /*Current dir listings*/
-    wrefresh(w_exp);
     wattron(w_exp, A_STANDOUT);
     for(i=0; i<100; i++){
         if( i == 0 ){ 
@@ -45,11 +43,10 @@ start:
         }
         else {
             wattroff( w_exp, A_STANDOUT );
-        sprintf(user ,"%s",  currdir[i]);
-        mvwprintw( w_exp, i+1, 2, "%s", user);
+            sprintf(user ,"%s",  currdir[i]);
+            mvwprintw( w_exp, i+1, 2, "%s", user);
         }
     }
-        wrefresh(w_exp);
 
     i = 0;
     int ch = 0; //user input
@@ -72,6 +69,8 @@ start:
                 case 0x0A: //Enter key (not numpad)
                             token = strtok(currdir[i], "\n"); //parsing for expls (removes newline)
                             chdir(currdir[i]);
+                            //Reset screen completely
+                            wclear(w_exp);
                             wrefresh(w_exp);
                             goto start; //Jump to start but load new files
             }
