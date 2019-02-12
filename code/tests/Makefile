@@ -6,7 +6,7 @@ PROMPT_OBJS = suites/prompt/tokenize/test_prompt_tokenize.o suites/prompt/colori
 
 EXP_OBJS = suites/explorer/test_explorer_traversal.o testExp.o
 
-all: setup testPrompt testExp
+all: testPrompt testExp
 
 testPrompt: $(PROMPT_OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
@@ -19,11 +19,8 @@ testExp: $(EXP_OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-setup:
-	mkdir regressions
 
 clean:
 	rm -f testPrompt testExp *.o test suites/*.o suites/*/*.o regressions/*
-	rmdir regressions
 
 .PHONY: all clean
