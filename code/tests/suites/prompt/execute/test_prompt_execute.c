@@ -4,8 +4,8 @@
 #include <dirent.h>
 #include <errno.h>
 
-#include "../../cu/cu.h"
-#include "../../../src/utils/execute.h"
+#include "../../../cu/cu.h"
+#include "../../../../src/utils/execute.h"
 
 TEST(test7) {
     char *line[2]  = {"mkdir", "testDir"};

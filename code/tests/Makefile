@@ -2,11 +2,16 @@ CC = gcc
 CFLAGS = -g -Wall -pedantic --std=gnu99
 LDFLAGS = -Lcu/ -lcu
 
-OBJS = suites/tokenize/test_prompt_tokenize.o suites/colorize/test_prompt_colorize.o suites/execute/test_prompt_execute.o suites/explorer/test_explorer_traversal.o runTests.o
+PROMPT_OBJS = suites/prompt/tokenize/test_prompt_tokenize.o suites/prompt/colorize/test_prompt_colorize.o suites/prompt/execute/test_prompt_execute.o testPrompt.o
 
-all: test
+EXP_OBJS = suites/explorer/test_explorer_traversal.o testExp.o
 
-test: $(OBJS)
+all: setup testPrompt testExp
+
+testPrompt: $(PROMPT_OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+testExp: $(EXP_OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c %.h
@@ -14,7 +19,11 @@ test: $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+setup:
+	mkdir regressions
+
 clean:
-	rm -f *.o test suites/*.o suites/*/*.o
+	rm -f testPrompt testExp *.o test suites/*.o suites/*/*.o regressions/*
+	rmdir regressions
 
 .PHONY: all clean
