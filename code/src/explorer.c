@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     /*ncurses Initial setup*/ 
     WINDOW * w_exp;
     initscr();
-    w_exp = newwin( 20, 20, 1, 1);
+    w_exp = newwin( 50, 50, 1, 1);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
@@ -69,7 +69,7 @@ start:
                 case 0x0A: //Enter key (not numpad)
                             token = strtok(currdir[i], "\n"); //parsing for expls (removes newline)
                             chdir(currdir[i]);
-                            //Reset screen completely
+                            //Reset screen completelyt
                             wclear(w_exp);
                             wrefresh(w_exp);
                             goto start; //Jump to start but load new files
