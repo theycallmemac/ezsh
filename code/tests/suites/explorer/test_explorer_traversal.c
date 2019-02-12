@@ -8,7 +8,7 @@
 
 static const char PATH[] = "./staticTestDir";
 
-TEST(test10) {
+TEST(test1) {
     char **files;
     if (( files = malloc( 100*sizeof( char* ))) == NULL){}
         for (int i = 0; i < 100; i++){
@@ -40,7 +40,7 @@ TEST(test10) {
     }
     assertTrue(isEqual);
 }
-TEST(test11) {
+TEST(test2) {
     char **files;
     if (( files = malloc( 100*sizeof( char* ))) == NULL){}
         for (int i = 0; i < 100; i++){

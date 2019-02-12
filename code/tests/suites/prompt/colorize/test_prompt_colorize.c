@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../cu/cu.h"
-#include "../../../src/utils/colour.h"
+#include "../../../cu/cu.h"
+#include "../../../../src/utils/colour.h"
 
 #define MAGENTA "\\33[1;35m"
 #define CYAN  "\\33[1;36m"

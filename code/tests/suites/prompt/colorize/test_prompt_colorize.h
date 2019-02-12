@@ -1,4 +1,4 @@
-#include "../../cu/cu.h"
+#include "../../../cu/cu.h"
 // Declarations of tests
 TEST(test3);
 TEST(test4);
