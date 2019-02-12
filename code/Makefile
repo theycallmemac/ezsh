@@ -17,7 +17,7 @@ $(PROMPT): $(PROMPT_OBJ)
 		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
 
 $(EXP): $(EXP_OBJ)
-		gcc -o $(EXP) $(EXP_OBJ)
+		gcc -o $(EXP) $(EXP_OBJ) -lncurses
 
 clean:
 		rm $(PROMPT) $(EXP) $(PROMPT_OBJ) $(EXP_OBJ)
