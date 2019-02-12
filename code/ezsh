@@ -1,6 +1,7 @@
 #!/bin/bash
 
 make
+cp .tmux.conf $HOME
 
 for f in {$PWD,$HOME}/.ezsh/.ezsh.conf; do
   test -f $f && layout=$f && break
@@ -48,5 +49,7 @@ tmux select-window -t $session:$active_window
 
 tmux select-pane -t $session:$active_window.$active_pane
 
-tmux $TMUX_OPTS attach-session -t $session
+tmux resize-pane -t 0 -x 4
 
+echo $active_pane hi there
+tmux $TMUX_OPTS attach-session -t $session

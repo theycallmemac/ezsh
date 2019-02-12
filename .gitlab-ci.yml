@@ -8,3 +8,4 @@ prompt:
         - make
         - ./test
         - make clean
+

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define EZSH_READLINE_BUFFSIZE 1024
-char *ezshReadLine(char *buffer) {
+char *ezshReadLine(void) {
     // declaring variables used in scope of ezshReadLine
     int buffsize = EZSH_READLINE_BUFFSIZE;
     int position = 0;
+    char *buffer = malloc(sizeof(char) * buffsize);
     int c;
 
     // if there is nothing allocated
@@ -12,6 +13,7 @@ char *ezshReadLine(char *buffer) {
         fprintf(stderr, "ezsh: allocation error occurreed\n");
         exit(EXIT_FAILURE);
     }
+
     while (1) {
         // read a char (though this is stored as an integer)
         // this is cause end of file is an integer, and to check it, you need an integer

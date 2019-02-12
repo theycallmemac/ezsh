@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -Wall -pedantic --std=gnu99
 LDFLAGS = -Lcu/ -lcu
 
-OBJS = suites/tokenize/test_prompt_tokenize.o suites/colorize/test_prompt_colorize.o suites/execute/test_prompt_execute.o runTests.o
+OBJS = suites/tokenize/test_prompt_tokenize.o suites/colorize/test_prompt_colorize.o suites/execute/test_prompt_execute.o suites/explorer/test_explorer_traversal.o runTests.o
 
 all: test
 
