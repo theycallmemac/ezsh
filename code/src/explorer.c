@@ -11,18 +11,19 @@ int main(int argc, char *argv[]) {
     char **currdir;
     char userInput[1];
     char user[10];
+    int windowSize = 16;
+    char **display;
     
     /*ncurses Initial setup*/ 
     WINDOW * w_exp;
     initscr();
-    w_exp = newwin( 50, 50, 1, 1);
+    w_exp = newwin( windowSize, 50, 1, 1);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
 
-start:
+loadNewDir:
     /*Allocate memory for currdir*/
-
     currdir = malloc( 100*sizeof( char* ));
     for (int i = 0; i < 100; i++){
         if ((currdir[i] = malloc(100)) == NULL){
@@ -30,54 +31,78 @@ start:
         }
     }
     
-    strcpy(command, "/bin/ls");
     /*Revised ls that returns ttl file count*/
+    strcpy(command, "/bin/ls");
     int p = expls(fptr, command, currdir) -1;
+    int currPoint = 0;
+    int section = 1;
+
+loadPage:
+    wclear(w_exp);
+    wrefresh(w_exp);
     int i = 0;
+    currPoint;
     
-    /*Current dir listings*/
-    wattron(w_exp, A_STANDOUT);
-    for(i=0; i<100; i++){
-        if( i == 0 ){ 
-            wattron( w_exp, A_STANDOUT );
-        }
-        else {
-            wattroff( w_exp, A_STANDOUT );
-            sprintf(user ,"%s",  currdir[i]);
-            mvwprintw( w_exp, i+1, 2, "%s", user);
+    display = malloc( 100*sizeof( char* ));
+    for (int i = 0; i < 100; i++){
+        if ((display[i] = malloc(100)) == NULL){
+            perror("ezsh");
         }
     }
+    
+    int j = 0;
+    for(currPoint; currPoint<15*section; currPoint++){
+            strcpy(display[j] ,currdir[currPoint]);
+            j ++;
+    }
+    
+    /*Current dir listings*/
+    for(int n=0; n<15*section; n++){
+            wattron(w_exp, A_STANDOUT);
+            wattroff( w_exp, A_STANDOUT );
+            sprintf(user ,"%s",  display[n]);
+            mvwprintw( w_exp, n+1, 2, "%s", user);
+    }
+    
+    wrefresh(w_exp);
 
-    i = 0;
     int ch = 0; //user input
     char * token;
 
-
     while(ch = wgetch(w_exp)){
-
-        sprintf(user ,"%s",  currdir[i]);
+        sprintf(user ,"%s",  display[i]);
         mvwprintw( w_exp, i+1, 2, "%s", user);
         switch( ch ) {
                 case KEY_UP:
                             i--;
                             i = ( i<0 ) ? p : i;
+                            // if(i == 16*section){
+                            //     currPoint = i;
+                            //     section--;
+                            //     goto loadPage;
+                            // }
                             break;
                 case KEY_DOWN:
                             i++;
-                            i = ( i>p) ? 0 : i;
+                            // i = ( i>16) ? 0 : i;
+                            if(i == 15*section){
+                                currPoint = i;
+                                section++;
+                                goto loadPage;
+                            }
                             break;
                 case 0x0A: //Enter key (not numpad)
-                            token = strtok(currdir[i], "\n"); //parsing for expls (removes newline)
-                            chdir(currdir[i]);
-                            //Reset screen completelyt
+                            token = strtok(display[i], "\n"); //parsing for expls (removes newline)
+                            chdir(display[i]);
+                            //Reset screen completely
                             wclear(w_exp);
                             wrefresh(w_exp);
-                            goto start; //Jump to start but load new files
+                            goto loadNewDir; //Jump to start but load new files
             }
 
         /*Update options accordingly after user input*/
             wattron( w_exp, A_STANDOUT);
-            sprintf(user ,"%s",  currdir[i]);
+            sprintf(user ,"%s",  display[i]);
             mvwprintw( w_exp, i+1, 2, "%s", user);
             wattroff(w_exp , A_STANDOUT);
 
