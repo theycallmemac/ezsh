@@ -22,6 +22,9 @@ void main() {
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
+    start_color();
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(2, COLOR_WHITE, COLOR_BLACK);
 
 loadNewDir:
     /*Allocate memory for currdir*/
@@ -75,6 +78,14 @@ loadPage:
     for(int n=0; n<=15; n++){
             wattron(w_exp, A_STANDOUT);
             wattroff( w_exp, A_STANDOUT );
+            if(n == 0 && currPoint == 0){
+                wattron(w_exp,COLOR_PAIR(1));
+            }
+            else if(isFile(strtok(display[n], "\n"))){
+                wattron(w_exp,COLOR_PAIR(2));
+            }else if(isDir(strtok(display[n], "\n"))){
+                wattron(w_exp,COLOR_PAIR(1));
+            }
             sprintf(user ,"%s",  display[n]);
             mvwprintw( w_exp, n+1, 2, "%s", user);
     }
@@ -122,6 +133,11 @@ loadPage:
 
         /*Update options accordingly after user input*/
             wattron( w_exp, A_STANDOUT);
+            if(isFile(strtok(display[i], "\n"))){
+                wattron(w_exp,COLOR_PAIR(2));
+            } else if(isDir(strtok(display[i], "\n"))){
+                wattron(w_exp,COLOR_PAIR(1));
+            }
             sprintf(user ,"%s",  display[i]);
             mvwprintw( w_exp, i+1, 2, "%s", user);
             wattroff(w_exp , A_STANDOUT);
