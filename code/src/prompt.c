@@ -1,11 +1,19 @@
 #include <stdlib.h>
+#include <stdio.h> 
 #include <signal.h>
+
+#include <sys/types.h>
+#include <pwd.h>
+
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "utils/colour.h"
-#include "utils/readline.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
+#include "utils/systemFiles.h"
 
-void ezshPrompt(char uname[], char cwd[], char hostname[]) {
+char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
     printf("╭─ ");
     bold_magenta();
     printf("%s ", uname);
@@ -19,6 +27,7 @@ void ezshPrompt(char uname[], char cwd[], char hostname[]) {
     printf("%s\n", cwd);
     reset();
     printf("╰ ");
+    return "";
 }
 
 void ezshLoop(void) {
@@ -39,9 +48,13 @@ void ezshLoop(void) {
         // get logged in user
         char* uname = getlogin();
         // pass info to function which handles prompt design
-        ezshPrompt(uname, cwd, hostname); 
-        // call the readline function
-        line = ezshReadLine();
+        // call the readline function, which takes the ezshPrompt function as a parameter
+        line = readline(ezshPrompt(uname, cwd, hostname));
+        //line = ezshReadLine(input);
+        //if (strcmp(line, "") == 1) {
+            add_history(line);
+            addToHistory(line);
+        //}
         // split line into arguments
         args = ezshSplitLine(line);
         // return status variable so the code knows when to exit
@@ -55,9 +68,26 @@ void ezshLoop(void) {
 
 static volatile int keepRunning = 1;
 
-int main() {
+void handler(int sig) {
+    rl_free_line_state ();
+    printf("\n");
+    char cwd[1024];
+    // sets size of 1024 for hostname
+    char hostname[1024];
+    // get size of hostname and load into variable
+    gethostname(hostname, 1024);
+    // load size of cwd into cwd
+    getcwd(cwd, sizeof(cwd));
+    // get logged in user
+    char* uname = getlogin();
+    ezshPrompt(uname,cwd, hostname);
+}
+
+int main(int argc, char **argv) {
     // the above paramters load configs if they exist
-    // loop to run commands
+    signal(SIGINT, handler);
+    rl_bind_key('\t', rl_complete);
+    createFiles();
     while (keepRunning) {
         ezshLoop();
     }

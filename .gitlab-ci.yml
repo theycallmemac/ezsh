@@ -1,0 +1,18 @@
+before_script:
+    - chmod +x code/tests/install_CUnit
+    - cd code/tests
+    - ./install_CUnit
+    - make
+
+prompt:
+    script:
+        - ./testPrompt
+
+explorer:
+    script:
+        - ./testExp
+
+after_script:
+    - code code/tests
+    - rm -r cu/
+    - make clean

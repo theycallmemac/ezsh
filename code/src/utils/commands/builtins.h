@@ -1,43 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
+
+#include "history.h"
 int ezshCD(char **args);
-int ezshHELP();
+int ezshHELP(char **args);
+int ezshHISTORY(char **args);
 int ezshEXIT();
 
 // some builtins and their functions
 char *builtinStr[] = {
     "cd",
     "help",
+    "history",
     "exit"
 };
+
 
 int (*builtinFunc[]) (char **) = {
     &ezshCD,
     &ezshHELP,
+    &ezshHISTORY,
     &ezshEXIT
 };
 
 int ezshNumBuiltins() {
     return sizeof(builtinStr) / sizeof(char *);
 }
-int ezshHELP() {
-    int i;
-    printf("James McDermott & Connor Mulready's ezsh\n");
-    printf("You can type regular commands and their arguments, followed by the return key.\n");
-    printf("The following list of commands are built in to ezsh:\n");
 
-    for (i = 0; i < ezshNumBuiltins(); i++) {
-      printf(" --> %s\n", builtinStr[i]);
-    }
-
-    printf("Use the man command for information on other programs.\n");
+int ezshHISTORY(char **args) {
+    showHistory();  
     return 0;
 }
+
+
+
+int ezshHELP(char **args) {
+    if (args[1] == NULL) {
+      fprintf(stderr, "ezsh: expected argument to \"help\"\n");
+    } else {
+       char buf[100];
+       snprintf(buf, sizeof(buf), "echo && man %s | grep -A 1 NAME |  sed 's/^[ \t]*//;s/[ \t]*$//' | sed -n '1!p' && echo", args[1]);                                   
+       system(buf); 
+    }
+    return 0;
+}
+
 int ezshCD(char **args) {
     if (args[1] == NULL) {
-      fprintf(stderr, "ezsh: expected argument to \"cd\"\n");
+        struct passwd *pw = getpwuid(getuid());
+        const char *HOME = pw->pw_dir;
+        if (chdir(HOME) != 0) {
+            perror("ezsh");
+        }
     } else {
       if (chdir(args[1]) != 0) {
         perror("ezsh");
