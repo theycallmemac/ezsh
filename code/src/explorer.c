@@ -4,20 +4,21 @@
 #include <string.h>
 #include "./utils/explorer.h"
 
-int main(int argc, char *argv[]) {
+void main() {
     
+    const int MAXSIZE = 20;
+
     FILE *fptr;
     char command[50];
     char **currdir;
     char userInput[1];
     char user[10];
-    int windowSize = 16;
-    char **display;
+    char *display[100];
     
     /*ncurses Initial setup*/ 
     WINDOW * w_exp;
     initscr();
-    w_exp = newwin( windowSize, 50, 1, 1);
+    w_exp = newwin( MAXSIZE, 50, 1, 1);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
@@ -40,24 +41,22 @@ loadNewDir:
 loadPage:
     wclear(w_exp);
     wrefresh(w_exp);
-    int i = 0;
     currPoint;
+    int i = 0;
     
-    display = malloc( 100*sizeof( char* ));
     for (int i = 0; i < 100; i++){
         if ((display[i] = malloc(100)) == NULL){
             perror("ezsh");
         }
     }
     
-    int j = 0;
-    for(currPoint; currPoint<15*section; currPoint++){
-            strcpy(display[j] ,currdir[currPoint]);
-            j ++;
+    for(int j=0; j<15; j++){
+        strcpy(display[j],currdir[currPoint]);
+        currPoint++;
     }
     
     /*Current dir listings*/
-    for(int n=0; n<15*section; n++){
+    for(int n=0; n<=15*section; n++){
             wattron(w_exp, A_STANDOUT);
             wattroff( w_exp, A_STANDOUT );
             sprintf(user ,"%s",  display[n]);
@@ -84,10 +83,11 @@ loadPage:
                             break;
                 case KEY_DOWN:
                             i++;
+                            // currPoint++;
                             // i = ( i>16) ? 0 : i;
-                            if(i == 15*section){
-                                currPoint = i;
-                                section++;
+                            if(i == 15){
+                                // currPoint = currPoint*section;
+                                // section++;
                                 goto loadPage;
                             }
                             break;
@@ -108,7 +108,6 @@ loadPage:
 
     }
     endwin();
-    return 0;
 }
 
     //     while(1){            
