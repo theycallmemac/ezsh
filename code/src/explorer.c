@@ -37,12 +37,13 @@ loadNewDir:
     int p = expls(fptr, command, currdir) -1;
     int currPoint = 0;
     int section = 1;
+    bool forward_flag = 1;
 
 loadPage:
     wclear(w_exp);
     wrefresh(w_exp);
     currPoint;
-    int i = 0;
+    int i;
     
     for (int i = 0; i < 100; i++){
         if ((display[i] = malloc(100)) == NULL){
@@ -50,9 +51,20 @@ loadPage:
         }
     }
     
-    for(int j=0; j<15; j++){
-        strcpy(display[j],currdir[currPoint]);
-        currPoint++;
+    if(forward_flag){
+        i = 0;
+        for(int j=0; j<15; j++){
+            strcpy(display[j],currdir[currPoint]);
+            currPoint++;
+        }
+    } else {
+        i = 14;
+        currPoint -= 30;
+        forward_flag = 1;
+        for(int j=0; j<15; j++){
+            strcpy(display[j],currdir[currPoint]);
+            currPoint++;
+            }
     }
     
     /*Current dir listings*/
@@ -74,20 +86,16 @@ loadPage:
         switch( ch ) {
                 case KEY_UP:
                             i--;
-                            i = ( i<0 ) ? p : i;
-                            // if(i == 16*section){
-                            //     currPoint = i;
-                            //     section--;
-                            //     goto loadPage;
-                            // }
+                            // i = ( i<0 ) ? p : i;
+                            if (i == -1) {
+                                forward_flag = 0;
+                                goto loadPage;
+                            }
                             break;
                 case KEY_DOWN:
                             i++;
-                            // currPoint++;
-                            // i = ( i>16) ? 0 : i;
+                            i = ( i>p) ? 0 : i;
                             if(i == 15){
-                                // currPoint = currPoint*section;
-                                // section++;
                                 goto loadPage;
                             }
                             break;
