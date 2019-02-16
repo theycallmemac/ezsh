@@ -34,15 +34,17 @@ loadNewDir:
     
     /*Revised ls that returns ttl file count*/
     strcpy(command, "/bin/ls");
-    int p = expls(fptr, command, currdir) -1;
+    int p = expls(fptr, command, currdir)-1;
+    //Track users section in currdir array (All files)
+    int currSection = 0;
     int currPoint = 0;
-    int section = 1;
+    //Discern whether user wants to load next page or last page
     bool forward_flag = 1;
 
 loadPage:
     wclear(w_exp);
     wrefresh(w_exp);
-    currPoint;
+    currSection;
     int i;
     
     for (int i = 0; i < 100; i++){
@@ -51,24 +53,26 @@ loadPage:
         }
     }
     
+    //Load next 15 entries on menu, set selected option to top file
     if(forward_flag){
         i = 0;
         for(int j=0; j<15; j++){
-            strcpy(display[j],currdir[currPoint]);
-            currPoint++;
+            strcpy(display[j],currdir[currSection]);
+            currSection++;
         }
+    //Set currSection back to last pages position, load 15 entries, set selected option to bottom file
     } else {
         i = 14;
-        currPoint -= 30;
+        currSection -= 30;
         forward_flag = 1;
         for(int j=0; j<15; j++){
-            strcpy(display[j],currdir[currPoint]);
-            currPoint++;
+            strcpy(display[j],currdir[currSection]);
+            currSection++;
             }
     }
     
     /*Current dir listings*/
-    for(int n=0; n<=15*section; n++){
+    for(int n=0; n<=15; n++){
             wattron(w_exp, A_STANDOUT);
             wattroff( w_exp, A_STANDOUT );
             sprintf(user ,"%s",  display[n]);
@@ -86,15 +90,23 @@ loadPage:
         switch( ch ) {
                 case KEY_UP:
                             i--;
-                            // i = ( i<0 ) ? p : i;
-                            if (i == -1) {
+                            currPoint--;
+                            if(i == -1 && currPoint == -1){
+                                i = 0;
+                                currPoint = 0;
+                            }
+                            if (i == -1 ) {
                                 forward_flag = 0;
                                 goto loadPage;
                             }
                             break;
                 case KEY_DOWN:
                             i++;
-                            i = ( i>p) ? 0 : i;
+                            currPoint++;
+                            if((i > (p%15)) && (currPoint > p)){
+                                i = (p%15);
+                                currPoint = p;
+                            }
                             if(i == 15){
                                 goto loadPage;
                             }
