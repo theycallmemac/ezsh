@@ -48,10 +48,8 @@ void ezshLoop(void) {
         getcwd(cwd, sizeof(cwd));
         char* uname = getlogin();
         line = readline(ezshPrompt(uname, cwd, hostname));
-        //if (strcmp(line, "") == 1) {
-            add_history(line);
-            addToHistory(line);
-        //}
+        add_history(line);
+        addToHistory(line);
         args = ezshSplitLine(line);
         status = ezshExecute(args);
         free(line);

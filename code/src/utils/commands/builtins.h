@@ -8,6 +8,7 @@
 #include "cd.h"
 #include "help.h"
 #include "history.h"
+#include "star.h"
 
 
 // Define functions to be loaded into builtinFunc
@@ -23,9 +24,22 @@ char *builtinStr[] = {
     "cd",
     "help",
     "history",
+    "star",
     "exit"
 };
 
+
+
+// ezshSTAR is the function called from prompt.c when you use `star`
+// This calls showStars() from star.h
+int ezshSTAR(char **args) {
+    if (args[1] == NULL) {
+        showStars();  
+    } else {
+        addStar(args[1]);
+    }
+    return 0;
+}
 
 // Store builtin functions here
 // These functions should be listed in order with their counterparts in the builtinStr above
@@ -33,6 +47,7 @@ int (*builtinFunc[]) (char **) = {
     &ezshCD,
     &ezshHELP,
     &ezshHISTORY,
+    &ezshSTAR,
     &ezshEXIT
 };
 

@@ -6,6 +6,7 @@
 
 #include "../files.h"
 
+
 void showHistory(void) {
     char *name = "history";
     char *PATH = getHome(name);
@@ -16,7 +17,7 @@ void showHistory(void) {
     char str[10000];
     int lineNumber = 1;
 
-    readFile(history, str, lineNumber);
+    showFile(history, str, lineNumber);
     closeFile(history);   
 }
 
