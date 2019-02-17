@@ -14,13 +14,13 @@ Output: Int, pass by reference & number of elements
 */
 int expls(FILE *fp, char * command, char **currdir){
 
+    strcpy(currdir[0], "..");
     char path[1024];
     fp = popen(command, "r");
     if (fp == NULL){
         exit(1);
     }
     int i = 1;
-    strcpy(currdir[0], "..");
     while(fgets(path, sizeof(path)-1, fp) != NULL){
         strcpy(currdir[i],path);
         i++;
@@ -34,6 +34,14 @@ Input: char* directory
 void expcd(char * dir){
     chdir(dir);
     system("echo 'hello' > ~/.ezsh/.ezsh.tty");
+}
+
+char* exppwd(FILE *fp){
+    char pwd[100];
+    fp = popen("/bin/pwd", "r");
+    char* path = (fgets(pwd, sizeof(pwd)-1, fp));
+    pclose(fp);
+    return(path);
 }
 
 /*
