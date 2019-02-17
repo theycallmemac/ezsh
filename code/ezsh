@@ -26,7 +26,7 @@ while read window pane command; do
   [ -z "$window" -o -z "$pane" -o -z "$command" ] && continue
   pane_number=${pane//[^0-9]*}
   active=${pane//[^*]}
-
+  
   if [[ -n $active ]]; then
     active_window=$window
     active_pane=$pane_number
@@ -37,7 +37,11 @@ while read window pane command; do
   fi
 
   if [[ -z $(tmux list-panes -t $session:$window  -F "#{pane_index}" | grep "^${pane_number}$") ]]; then
-    tmux split-window -h -t $session:$window
+    if [[ "$pane_number" == "2" ]];then
+        tmux split-window -v -t $session:$window
+    else
+        tmux split-window -h -t $session:$window
+    fi
   fi
 
   tmux send-keys -t $session:$window.$pane_number "$command" C-m
@@ -49,7 +53,4 @@ tmux select-window -t $session:$active_window
 
 tmux select-pane -t $session:$active_window.$active_pane
 
-tmux resize-pane -t 0 -x 4
-
-echo $active_pane hi there
 tmux $TMUX_OPTS attach-session -t $session
