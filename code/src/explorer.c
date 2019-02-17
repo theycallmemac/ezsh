@@ -7,6 +7,7 @@
 void main() {
     
     const int MAXSIZE = 20;
+    const int OPTIONS = 15;
 
     FILE *fptr;
     char command[50];
@@ -14,6 +15,7 @@ void main() {
     char userInput[1];
     char user[10];
     char *display[100];
+    char pwd[200];
     
     /*ncurses Initial setup*/ 
     WINDOW * w_exp;
@@ -34,6 +36,8 @@ loadNewDir:
             perror("ezsh");
         }
     }
+
+    strcpy(pwd,exppwd(fptr));
     
     /*Revised ls that returns ttl file count*/
     strcpy(command, "/bin/ls");
@@ -59,7 +63,7 @@ loadPage:
     //Load next 15 entries on menu, set selected option to top file
     if(forward_flag){
         i = 0;
-        for(int j=0; j<15; j++){
+        for(int j=0; j<OPTIONS; j++){
             strcpy(display[j],currdir[currSection]);
             currSection++;
         }
@@ -68,14 +72,17 @@ loadPage:
         i = 14;
         currSection -= 30;
         forward_flag = 1;
-        for(int j=0; j<15; j++){
+        for(int j=0; j<OPTIONS; j++){
             strcpy(display[j],currdir[currSection]);
             currSection++;
             }
     }
-    
+    wattroff(w_exp, A_BOLD);
+    wattron(w_exp, A_UNDERLINE | COLOR_PAIR(2));
+    mvwprintw(w_exp, 0,2,pwd);
+    wattroff(w_exp, A_UNDERLINE);
     /*Current dir listings*/
-    for(int n=0; n<=15; n++){
+    for(int n=0; n<=OPTIONS; n++){
             wattron(w_exp, A_STANDOUT);
             wattroff( w_exp, A_STANDOUT );
             if(n == 0 && currPoint == 0){
@@ -83,13 +90,13 @@ loadPage:
             }
             else if(isFile(strtok(display[n], "\n"))){
                 wattron(w_exp,COLOR_PAIR(2));
+                wattroff(w_exp, A_BOLD);
             }else if(isDir(strtok(display[n], "\n"))){
-                wattron(w_exp,COLOR_PAIR(1));
+                wattron(w_exp,COLOR_PAIR(1)| A_BOLD);
             }
             sprintf(user ,"%s",  display[n]);
             mvwprintw( w_exp, n+1, 2, "%s", user);
     }
-    
     wrefresh(w_exp);
 
     int ch = 0; //user input
@@ -114,11 +121,11 @@ loadPage:
                 case KEY_DOWN:
                             i++;
                             currPoint++;
-                            if((i > (p%15)) && (currPoint > p)){
-                                i = (p%15);
+                            if((i > (p%OPTIONS)) && (currPoint > p)){
+                                i = (p%OPTIONS);
                                 currPoint = p;
                             }
-                            if(i == 15){
+                            if(i == OPTIONS){
                                 goto loadPage;
                             }
                             break;
@@ -135,8 +142,9 @@ loadPage:
             wattron( w_exp, A_STANDOUT);
             if(isFile(strtok(display[i], "\n"))){
                 wattron(w_exp,COLOR_PAIR(2));
+                wattroff(w_exp, A_BOLD);
             } else if(isDir(strtok(display[i], "\n"))){
-                wattron(w_exp,COLOR_PAIR(1));
+                wattron(w_exp,COLOR_PAIR(1)| A_BOLD);
             }
             sprintf(user ,"%s",  display[i]);
             mvwprintw( w_exp, i+1, 2, "%s", user);
