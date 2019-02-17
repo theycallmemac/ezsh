@@ -36,6 +36,14 @@ void expcd(char * dir){
     system("echo 'hello' > ~/.ezsh/.ezsh.tty");
 }
 
+char* exppwd(FILE *fp){
+    char pwd[100];
+    fp = popen("/bin/pwd", "r");
+    char* path = (fgets(pwd, sizeof(pwd)-1, fp));
+    pclose(fp);
+    return(path);
+}
+
 /*
 Input: file name
 Output: bool
