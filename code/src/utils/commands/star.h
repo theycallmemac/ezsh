@@ -5,7 +5,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+//  This function shows the entire log of directories the user has starred
+// Returns void and parameters are void
 void showStars(void) {
     char *name = "stars";
     char *PATH = getHome(name);
@@ -20,6 +21,9 @@ void showStars(void) {
     closeFile(stars);
 }
 
+
+// This function adds to our stars file
+// Returns an int, zero, and takes the tokenized command as a parameter
 int addStar(char *line) {
     char *name = "stars";
     char *PATH = getHome(name);

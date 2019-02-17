@@ -4,9 +4,12 @@
 #include <pwd.h>
 #include <unistd.h>
 
+
 #include "../files.h"
 
 
+//  This function shows the entire history of the user (what they have entered at the prompt)
+// Returns void and parameters are void
 void showHistory(void) {
     char *name = "history";
     char *PATH = getHome(name);
@@ -21,6 +24,9 @@ void showHistory(void) {
     closeFile(history);   
 }
 
+
+// This function adds to our history file
+// Returns an int, zero, and takes the tokenized command as a parameter
 int addToHistory(char *line) {
     char *name = "history";
     char *PATH = getHome(name);
