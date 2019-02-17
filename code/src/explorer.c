@@ -131,7 +131,11 @@ loadPage:
                             break;
                 case 0x0A: //Enter key (not numpad)
                             token = strtok(display[i], "\n"); //parsing for expls (removes newline)
-                            chdir(display[i]);
+                            if(isDir(token) || strcmp(token,"..")==0){
+                                chdir(display[i]);
+                            } else if(isFile(token) && !fork()){
+                                execlp("gedit","gedit", token, NULL);
+                            }
                             //Reset screen completely
                             wclear(w_exp);
                             wrefresh(w_exp);
