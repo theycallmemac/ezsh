@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 
 #include "./utils/explorer.h"
 
@@ -123,8 +122,14 @@ resizeRefresh:
         sprintf(option, "%s", display[n]);
         mvwprintw(w_exp, n + MARGINTOP, 2, "%s", option);
     }
-    wrefresh(w_exp);
 
+    /*Current location*/
+    // wattroff(w_exp, A_BOLD);
+    wattron(w_exp, COLOR_PAIR(2));    
+    mvwprintw(w_exp, 19, 0, "File: %d/%d", currPoint, p);
+    wattron(w_exp, COLOR_PAIR(1));
+
+    wrefresh(w_exp);
     int ch = 0; //user input
     char *token;
 
@@ -185,6 +190,9 @@ resizeRefresh:
 
         /*Update options accordingly after option input*/
 
+        wattron(w_exp, COLOR_PAIR(2));
+        wattroff(w_exp, A_BOLD);
+        mvwprintw(w_exp, 19, 0, "File: %d/%d", currPoint, p);
         wattron(w_exp, A_STANDOUT);
         if (isFile(strtok(display[i], "\n")))
         {
