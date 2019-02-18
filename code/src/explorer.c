@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+
 #include "./utils/explorer.h"
 
 void main()
@@ -19,6 +21,9 @@ void main()
     char *display[100];
     char pwd[100];
 
+    int prevCol;
+    int prevRow;
+
     /*ncurses Initial setup*/
     WINDOW *w_exp;
     initscr();
@@ -32,10 +37,10 @@ void main()
 
 loadNewDir:
     /*Allocate memory for currdir*/
-    currdir = malloc(100 * sizeof(char *));
-    for (int i = 0; i < 100; i++)
+    currdir = malloc(1000 * sizeof(char *));
+    for (int i = 0; i < 200; i++)
     {
-        if ((currdir[i] = malloc(100)) == NULL)
+        if ((currdir[i] = malloc(1000)) == NULL)
         {
             perror("ezsh");
         }
@@ -89,6 +94,8 @@ loadPage:
             currSection++;
         }
     }
+
+resizeRefresh:
     /*Option attribute prep*/
     wattroff(w_exp, A_BOLD);
     wattron(w_exp, A_UNDERLINE | COLOR_PAIR(2));
@@ -162,6 +169,7 @@ loadPage:
                 //Reset screen completely
                 wclear(w_exp);
                 wrefresh(w_exp);
+                free(currdir);
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
@@ -170,6 +178,9 @@ loadPage:
                 execlp("gedit", "gedit", token, NULL);
                 break;
             }
+        case KEY_RESIZE:
+            wclear(w_exp);
+                goto resizeRefresh;
         }
 
         /*Update options accordingly after option input*/
