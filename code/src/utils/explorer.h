@@ -33,7 +33,6 @@ Input: char* directory
 */
 void expcd(char * dir){
     chdir(dir);
-    system("echo 'hello' > ~/.ezsh/.ezsh.tty");
 }
 
 char* exppwd(FILE *fp){
