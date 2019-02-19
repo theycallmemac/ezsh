@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "./utils/explorer.h"
+
+
+#include "utils/explorer.h"
+
 
 void main()
 {
@@ -18,6 +21,7 @@ void main()
     char option[10];
     char *display[100];
     char pwd[100];
+    char test[100];
 
     /*ncurses Initial setup*/
     WINDOW *w_exp;
@@ -31,8 +35,11 @@ void main()
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
 
 loadNewDir:
+    system(""); 
     /*Allocate memory for currdir*/
-    currdir = malloc(100 * sizeof(char *));
+    char *whatHappen = "YELL='\033[1;33m' && WHITE='\033[0m' && CDVAR='cd ' && echo ${YELL}'Command -->' ${WHITE}$CDVAR$PWD > $(tail -1 ~/.ezsh/.ezsh.tty)\n";
+    system(whatHappen);
+    currdir = malloc(100 * sizeof(char *));   
     for (int i = 0; i < 100; i++)
     {
         if ((currdir[i] = malloc(100)) == NULL)
@@ -157,7 +164,7 @@ loadPage:
         case 0x0A:                            //Enter key (not numpad)
             token = strtok(display[i], "\n"); //parsing for expls (removes newline)
             if (isDir(token) || strcmp(token, "..") == 0)
-            {
+            {   
                 chdir(display[i]);
                 //Reset screen completely
                 wclear(w_exp);
