@@ -44,6 +44,12 @@ FILE *openFileRead(char *path) {
 }
 
 
+// This function opens a file for writing
+// Takes the path to the file as a parameter and returns the FILE pointer from opening that file for writing
+FILE *openFileWrite(char *path) {
+    FILE *file = fopen(path, "w");
+    return file;
+}
 // This function opens a file for appending
 // Takes the path to the file as a parameter and returns the FILE pointer from opening that file for appending
 FILE *openFileAppend(char *path) {
@@ -75,5 +81,5 @@ void closeFile(FILE *file) {
 // This function appends a line of text to a file
 // This function takes a FILE pointer and a character pointer.
 void append(FILE *file, char *line) {
-    fprintf(file, "%s\n", line); 
+    fprintf(file, "%s\n", line);
 }

@@ -67,6 +67,10 @@ int ezshExecute(char **args) {
         parseHistory(args);
         return 0;
     }
+    if (args[0][0] == '*') {
+        parseStars(args);
+        return 0;
+    }
     for (itr = 0; itr < ezshNumBuiltins(); itr++) {
         if (strcmp(args[0], builtinStr[itr]) == 0) {
             return (*builtinFunc[itr])(args);

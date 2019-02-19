@@ -47,7 +47,7 @@ void ezshLoop(void) {
         getcwd(cwd, sizeof(cwd));
         char* uname = getlogin();
         line = readline(ezshPrompt(uname, cwd, hostname));
-        if (line[0] != '!') {
+        if (line[0] != '!' || line[0] != '*') {
             add_history(line);
             addToHistory(line);
         }
