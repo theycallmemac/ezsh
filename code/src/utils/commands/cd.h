@@ -3,9 +3,10 @@
 #include <pwd.h>
 
 // This function is invoked to check if changing to that directory is possible or not
-void errorChangeDir(const char *dir) {
+int errorChangeDir(const char *dir) {
     if (chdir(dir) != 0) {
         perror("ezsh");
+        return 1;
     }
 }
 
@@ -20,11 +21,12 @@ const char *changeHome(void) {
 
 // This function is used to determine if a directory change is possible
 // Takes the tokenized command (char ** args) and returns void type
-void changeDir(char **args) {
+int changeDir(char **args) {
     if (args[1] == NULL) {
         const char *HOME = changeHome();
         errorChangeDir(HOME);
     } else {
         errorChangeDir(args[1]);
     }
+    return 0;
 }

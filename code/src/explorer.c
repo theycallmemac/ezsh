@@ -8,17 +8,20 @@
 void main()
 {
 
-    const int MAXSIZE = 20;
+    const int MAXSIZE = 35;
     const int OPTIONS = 15;
-    const int MARGINTOP = 2;
+    const int MARGINTOP = 3;
+
+    const int FILEINDEX = 30;
+    const int PWDY = 29;
 
     FILE *fptr;
     char command[50];
     char **currdir;
     char optionInput[1];
     char option[10];
-    char *display[100];
     char pwd[100];
+    char **display;
 
     int prevCol;
     int prevRow;
@@ -35,9 +38,13 @@ void main()
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
 
 loadNewDir:
+    system("");
     /*Allocate memory for currdir*/
-    currdir = malloc(1000 * sizeof(char *));
-    for (int i = 0; i < 200; i++)
+    char *dirMsg = "YELL='\033[1;33m' && WHITE='\033[0m' && CDVAR='cd ' && echo ${YELL}'Command -->' ${WHITE}$CDVAR$PWD > $(tail -1 ~/.ezsh/.ezsh.tty)\n";
+    system(dirMsg);
+    
+    currdir = malloc(100 * sizeof(char *));
+    for (int i = 0; i < 100; i++)
     {
         if ((currdir[i] = malloc(1000)) == NULL)
         {
@@ -62,6 +69,7 @@ loadPage:
     currSection;
     int i;
 
+    display = malloc(100 * sizeof(char *));
     for (int i = 0; i < 100; i++)
     {
         if ((display[i] = malloc(100)) == NULL)
@@ -69,6 +77,7 @@ loadPage:
             perror("ezsh");
         }
     }
+
 
     /*Load next n OPTIONS on menu, set selected option to top file*/
     if (forward_flag)
@@ -80,7 +89,7 @@ loadPage:
             currSection++;
         }
     }
-        /*Set currSection back to last pages position, load n options
+    /*Set currSection back to last pages position, load n options
          set selected option to bottom file*/
     else
     {
@@ -98,9 +107,9 @@ resizeRefresh:
     /*Option attribute prep*/
     wattroff(w_exp, A_BOLD);
     wattron(w_exp, A_UNDERLINE | COLOR_PAIR(2));
-    mvwprintw(w_exp, 18, 2, pwd);
+    mvwprintw(w_exp, PWDY, 0, pwd);
     wattroff(w_exp, A_UNDERLINE);
-    
+
     /*Current dir listings*/
     for (int n = 0; n <= OPTIONS; n++)
     {
@@ -125,8 +134,8 @@ resizeRefresh:
 
     /*Current location*/
     // wattroff(w_exp, A_BOLD);
-    wattron(w_exp, COLOR_PAIR(2));    
-    mvwprintw(w_exp, 19, 0, "File: %d/%d", currPoint, p);
+    wattron(w_exp, COLOR_PAIR(2));
+    mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
     wattron(w_exp, COLOR_PAIR(1));
 
     wrefresh(w_exp);
@@ -175,6 +184,7 @@ resizeRefresh:
                 wclear(w_exp);
                 wrefresh(w_exp);
                 free(currdir);
+                free(display);
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
@@ -185,14 +195,14 @@ resizeRefresh:
             }
         case KEY_RESIZE:
             wclear(w_exp);
-                goto resizeRefresh;
+            goto resizeRefresh;
         }
 
         /*Update options accordingly after option input*/
 
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
-        mvwprintw(w_exp, 19, 0, "File: %d/%d", currPoint, p);
+        mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
         wattron(w_exp, A_STANDOUT);
         if (isFile(strtok(display[i], "\n")))
         {
@@ -205,7 +215,7 @@ resizeRefresh:
         }
         sprintf(option, "%s", display[i]);
         mvwprintw(w_exp, i + MARGINTOP, 2, "%s", option);
-        wattroff(w_exp, A_STANDOUT);
+        wattroff(w_exp, A_STANDOUT | A_UNDERLINE);
     }
     endwin();
 }

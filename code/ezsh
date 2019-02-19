@@ -54,3 +54,4 @@ tmux select-window -t $session:$active_window
 tmux select-pane -t $session:$active_window.$active_pane
 
 tmux $TMUX_OPTS attach-session -t $session
+
