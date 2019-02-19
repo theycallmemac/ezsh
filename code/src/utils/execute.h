@@ -7,7 +7,6 @@
 
 #include "commands/builtins.h"
 
-
 // This function is called when the process id is zero
 // This gives the child process control
 void childProcess(char **args) {
@@ -47,6 +46,7 @@ void determineProcess(char **args, pid_t pid, int status) {
     }
 }
 
+
 // This function forks the process executed and calls determineProcess() to decide who controls it
 int ezshLaunch(char **args) {
     pid_t pid;
@@ -63,6 +63,10 @@ int ezshExecute(char **args) {
     if (args[0] == NULL) {
         return 1;
      }
+    if (args[0][0] == '!') {
+        parseHistory(args);
+        return 0;
+    }
     for (itr = 0; itr < ezshNumBuiltins(); itr++) {
         if (strcmp(args[0], builtinStr[itr]) == 0) {
             return (*builtinFunc[itr])(args);
