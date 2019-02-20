@@ -44,6 +44,7 @@ void main()
             mvwprintw(w_commands,7,  30, commands[3][0]);
             mvwprintw(w_commands,9,  30, commands[3][1]);
             mvwprintw(w_commands,11, 30, commands[3][2]);
+            wrefresh(w_commands);
         }
 }
 
