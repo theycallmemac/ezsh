@@ -62,7 +62,6 @@ int parseHistory(char **args) {
         i++;
         n = n * 10;
     }
-    total -= 1;
     while (fgets(fileLine, sizeof(fileLine), hist)) {
         char **words = ezshSplitLine(fileLine);
         if (total == countLine) {
