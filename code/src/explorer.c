@@ -8,34 +8,36 @@
 void main()
 {
 
-    const int MAXSIZE = 35;
+    const int MAXSIZE = 17;
     const int OPTIONS = 15;
+    const int PADDINGTOP = 1;
     const int MARGINTOP = 3;
 
     const int FILEINDEX = 30;
-    const int PWDY = 29;
+    const int PWDY = 20;
 
     FILE *fptr;
     char command[50];
     char **currdir;
-    char optionInput[1];
     char option[10];
     char pwd[100];
     char **display;
 
-    int prevCol;
-    int prevRow;
-
     /*ncurses Initial setup*/
     WINDOW *w_exp;
+    WINDOW *w_command;
+    WINDOW *w_info;
     initscr();
-    w_exp = newwin(MAXSIZE, 50, 1, 1);
+    w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1);
+    w_command = newwin(1, 30, 0, 5);
+    w_info = newwin(3, 30,20,2);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
     start_color();
     init_pair(1, COLOR_CYAN, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);
 
 loadNewDir:
     system("");
@@ -104,12 +106,6 @@ loadPage:
     }
 
 resizeRefresh:
-    /*Option attribute prep*/
-    wattroff(w_exp, A_BOLD);
-    wattron(w_exp, A_UNDERLINE | COLOR_PAIR(2));
-    mvwprintw(w_exp, PWDY, 0, pwd);
-    wattroff(w_exp, A_UNDERLINE);
-
     /*Current dir listings*/
     for (int n = 0; n <= OPTIONS; n++)
     {
@@ -129,23 +125,24 @@ resizeRefresh:
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
         sprintf(option, "%s", display[n]);
-        mvwprintw(w_exp, n + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, n + PADDINGTOP, 2, "%s", option);
     }
 
     /*Current location*/
-    // wattroff(w_exp, A_BOLD);
-    wattron(w_exp, COLOR_PAIR(2));
-    mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
+    wattron(w_info, COLOR_PAIR(2));
+    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
     wattron(w_exp, COLOR_PAIR(1));
 
     wrefresh(w_exp);
+    wrefresh(w_info);
     int ch = 0; //user input
     char *token;
 
     while (ch = wgetch(w_exp))
     {
         sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
+        wrefresh(w_command);
         switch (ch)
         {
         case KEY_UP:
@@ -180,7 +177,7 @@ resizeRefresh:
             if (isDir(token) || strcmp(token, "..") == 0)
             {
                 chdir(display[i]);
-                //Reset screen completely
+                //Reset win completely
                 wclear(w_exp);
                 wrefresh(w_exp);
                 free(currdir);
@@ -199,11 +196,26 @@ resizeRefresh:
         }
 
         /*Update options accordingly after option input*/
+        
+        wattron(w_command, COLOR_PAIR(3) | A_BOLD);
+        if (isFile(strtok(display[i], "\n"))){
+            mvwprintw(w_command, 0, 10, "Command: gedit %s", display[i]);
+            wrefresh(w_command);
+            wclear(w_command);
+        }
+        else if (isDir(strtok(display[i], "\n"))){
+            mvwprintw(w_command, 0, 10, "Command: cd %s", display[i]);
+            wrefresh(w_command);
+            wclear(w_command);
+        }
 
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
-        mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
+        wclear(w_info);
+        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
         wattron(w_exp, A_STANDOUT);
+        wrefresh(w_info);
+
         if (isFile(strtok(display[i], "\n")))
         {
             wattron(w_exp, COLOR_PAIR(2));
@@ -214,7 +226,7 @@ resizeRefresh:
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
         sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
         wattroff(w_exp, A_STANDOUT | A_UNDERLINE);
     }
     endwin();
