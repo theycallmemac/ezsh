@@ -37,7 +37,7 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
 // This function takes no parameters
 // This function is of type void, so it returns nothing
 void ezshLoop(void) {
-    char *line;
+    char *line = "";
     char **args;
     int status;
     do {
@@ -62,7 +62,7 @@ void ezshLoop(void) {
 // Take one parameter, a signal (such as `ctrl-C`)
 // Returns the void type, meaning it returns nothing
 void handler(int signal) {
-    rl_free_line_state ();
+    rl_free_line_state();
     printf("\n");
     char cwd[1024];
     char hostname[1024];
