@@ -41,9 +41,11 @@ void main()
     char option[10];
     char macroOption[10];
     char pwd[100];
+    char newDirPath[100];
+    char newDirName[80];
     char **display;
 
-    char shortcut[3][5] = {"BACK", "HOME", "STAR"};
+    char shortcut[3][10] = {"MKDIR", "HOME", "STAR"};
 
     /*ncurses Initial setup*/
     WINDOW *w_exp;
@@ -52,8 +54,8 @@ void main()
     WINDOW *w_macros;
     initscr();
     w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1);
-    w_command = newwin(1, 30, 0, 30);
-    w_info = newwin(3, 30, 20, 2);
+    w_command = newwin(1, 30, 0, 21);
+    w_info = newwin(8, 30, 20, 2);
     w_macros = newwin(3, 20, 0, 3);
     noecho();
     curs_set(FALSE);
@@ -159,6 +161,7 @@ resizeRefresh:
     wattron(w_command, COLOR_PAIR(3) | A_BOLD);
     wattron(w_macros, A_BOLD | A_UNDERLINE);
     mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+    mvwprintw(w_info, 1, 0, "%s", pwd);
     mvwprintw(w_command, 0, 0, "Command:");
     for(int i=0; i<3; i++){
         if(i==0){
@@ -225,6 +228,25 @@ resizeRefresh:
             commandFlag = 1;
             topOption = (topOption > 2) ? 0: topOption;
             break;
+        case 0x20:
+            if (topOption == 0) {
+                /* code */
+                echo();
+                token = strtok(pwd, "\n");
+                strcpy(newDirPath, token);
+                getstr(newDirName);
+                token = strtok(newDirName, "\n");
+                strcat(newDirPath, "/");
+                strcat(newDirPath, newDirName);
+                mvwprintw(w_info,5,0,"%s", newDirPath);
+                wrefresh(w_info);
+                wclear(w_macros);
+                mkdir(newDirPath, 0777);
+                noecho();
+                goto loadNewDir;
+                break;
+            }
+            
 
         case 0x0A:                            //Enter key (not numpad)
             token = strtok(display[i], "\n"); //parsing for expls (removes newline)
@@ -276,7 +298,7 @@ resizeRefresh:
         else if (commandFlag == 1){
             if (topOption == 0)
             {
-                mvwprintw(w_command, 0, 0, "Command: Gnelf");
+                mvwprintw(w_command, 0, 0, "Command: mkdir 'DirectoryName'");
                 wrefresh(w_command);
                 wclear(w_command);
             }
@@ -298,6 +320,7 @@ resizeRefresh:
         wattroff(w_exp, A_BOLD);
         wclear(w_info);
         mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+        mvwprintw(w_info, 1, 0, "%s", pwd);
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
