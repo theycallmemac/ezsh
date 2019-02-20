@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     int keepRunning = 1;
     signal(SIGINT, handler);
     rl_bind_key('\t', rl_complete);
-    createFiles();
+    checkFiles();
     while (keepRunning) {
         ezshLoop();
     }
