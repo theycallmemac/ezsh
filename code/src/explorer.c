@@ -177,6 +177,7 @@ resizeRefresh:
     int ch = 0; //user input
     char *token;
     int topOption = 0;
+    int commandFlag;
 
     while (ch = wgetch(w_exp))
     {
@@ -192,6 +193,7 @@ resizeRefresh:
         case KEY_UP:
             i--;
             currPoint--;
+            commandFlag = 0;
             if (i == -1 && currPoint == -1)
             {
                 i = 0;
@@ -206,6 +208,7 @@ resizeRefresh:
         case KEY_DOWN:
             i++;
             currPoint++;
+            commandFlag = 0;
             if ((i > (p % OPTIONS)) && (currPoint > p))
             {
                 i = (p % OPTIONS);
@@ -219,6 +222,7 @@ resizeRefresh:
         
         case 0x9:
             topOption++;
+            commandFlag = 1;
             topOption = (topOption > 2) ? 0: topOption;
             break;
 
@@ -254,15 +258,40 @@ resizeRefresh:
         wrefresh(w_macros);
         
         wattron(w_command, COLOR_PAIR(3) | A_BOLD);
-        if (isFile(strtok(display[i], "\n"))){
-            mvwprintw(w_command, 0, 0, "Command: gedit %s", display[i]);
-            wrefresh(w_command);
-            wclear(w_command);
+        if (commandFlag == 0)
+        {
+            if (isFile(strtok(display[i], "\n")))
+            {
+                mvwprintw(w_command, 0, 0, "Command: gedit %s", display[i]);
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if (isDir(strtok(display[i], "\n")))
+            {
+                mvwprintw(w_command, 0, 0, "Command: cd %s", display[i]);
+                wrefresh(w_command);
+                wclear(w_command);
+            }
         }
-        else if (isDir(strtok(display[i], "\n"))){
-            mvwprintw(w_command, 0, 0, "Command: cd %s", display[i]);
-            wrefresh(w_command);
-            wclear(w_command);
+        else if (commandFlag == 1){
+            if (topOption == 0)
+            {
+                mvwprintw(w_command, 0, 0, "Command: Gnelf");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if (topOption == 1)
+            {
+                mvwprintw(w_command, 0, 0, "Command: Gnoblin");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if(topOption == 2)
+            {
+                mvwprintw(w_command, 0, 0, "Command: GNOME");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
         }
 
         wattron(w_exp, COLOR_PAIR(2));
