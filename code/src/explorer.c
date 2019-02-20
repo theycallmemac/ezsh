@@ -169,7 +169,7 @@ resizeRefresh:
         } else {
             wattroff(w_macros, A_STANDOUT);
             sprintf(macroOption, "%s", shortcut[i]);
-            mvwprintw(w_macros, 0,i*5, "%s", macroOption);
+            mvwprintw(w_macros, 0,i*6, "%s", macroOption);
         }
     }
     wrefresh(w_exp); 
@@ -185,7 +185,7 @@ resizeRefresh:
     while (ch = wgetch(w_exp))
     {
         sprintf(macroOption, "%s", shortcut[topOption]);
-        mvwprintw(w_macros, 0, topOption*5, "%s", macroOption);
+        mvwprintw(w_macros, 0, topOption*6, "%s", macroOption);
         wrefresh(w_macros);
 
         sprintf(option, "%s", display[i]);
@@ -245,6 +245,10 @@ resizeRefresh:
                 noecho();
                 goto loadNewDir;
                 break;
+            } else if(topOption == 1){
+                //need to get hostname
+                chdir("/home");
+                goto loadNewDir;
             }
             
 
@@ -275,7 +279,7 @@ resizeRefresh:
 
         wattron(w_macros, A_STANDOUT);
         sprintf(option, "%s", shortcut[topOption]);
-        mvwprintw(w_macros, 0, topOption*5, "%s", option);
+        mvwprintw(w_macros, 0, topOption*6, "%s", option);
         wattroff(w_macros, A_STANDOUT);
         wrefresh(w_macros);
         
@@ -304,13 +308,13 @@ resizeRefresh:
             }
             else if (topOption == 1)
             {
-                mvwprintw(w_command, 0, 0, "Command: Gnoblin");
+                mvwprintw(w_command, 0, 0, "Command: $HOME");
                 wrefresh(w_command);
                 wclear(w_command);
             }
             else if(topOption == 2)
             {
-                mvwprintw(w_command, 0, 0, "Command: GNOME");
+                mvwprintw(w_command, 0, 0, "Command: Missing");
                 wrefresh(w_command);
                 wclear(w_command);
             }
