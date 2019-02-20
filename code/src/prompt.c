@@ -12,7 +12,6 @@
 #include "utils/execute.h"
 #include "utils/systemFiles.h"
 
-
 // This function sets up the default prompt of ezsh
 // Takes three char arrays: uname (the name of the current user), cwd (the name of the currently working directory), and hostname (the name of the machine they are working on)
 // The function returns an empty char* so it may work in sync with the readline library
@@ -48,8 +47,10 @@ void ezshLoop(void) {
         getcwd(cwd, sizeof(cwd));
         char* uname = getlogin();
         line = readline(ezshPrompt(uname, cwd, hostname));
-        add_history(line);
-        addToHistory(line);
+        if (line[0] != '!' || line[0] != '*') {
+            add_history(line);
+            addToHistory(line);
+        }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
         free(line);

@@ -6,6 +6,7 @@
 
 
 #include "../files.h"
+#include "../strings.h"
 
 
 //  This function shows the entire history of the user (what they have entered at the prompt)
@@ -37,4 +38,40 @@ int addToHistory(char *line) {
     append(history, line);
     closeFile(history);
     return 0;
+}
+
+
+int parseHistory(char **args) {
+    char history[10] = "history";
+    char *filename = getHome(history);
+    FILE *hist = openFileRead(filename);
+    char fileLine[32];
+    int countLine = 0;
+    int status = 0;
+
+
+    strrev(args[0]);
+
+
+    int i = 0;
+    int n = 1;
+    int total = 0;
+    while (args[0][i] != '!') {
+        int c = (args[0][i] - 48) * n;
+        total += c;
+        i++;
+        n = n * 10;
+    }
+    total -= 1;
+    while (fgets(fileLine, sizeof(fileLine), hist)) {
+        char **words = ezshSplitLine(fileLine);
+        if (total == countLine) {
+            status = ezshExecute(words);
+            free(words);
+            break;
+        }
+        countLine++;
+    }
+    closeFile(hist);
+    return status;
 }
