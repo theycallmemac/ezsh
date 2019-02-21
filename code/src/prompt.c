@@ -37,7 +37,7 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
 // This function takes no parameters
 // This function is of type void, so it returns nothing
 void ezshLoop(void) {
-    char *line = "";
+    char *line;
     char **args;
     int status;
     do {
