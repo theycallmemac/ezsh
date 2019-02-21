@@ -5,37 +5,65 @@
 
 #include "./utils/explorer.h"
 
+    void draw_borders(WINDOW * win)
+    {
+        int x, y, i;
+        getmaxyx(win, y, x);
+        mvwprintw(win, 0, 0, "+");
+        mvwprintw(win, y - 1, 0, "+");
+        mvwprintw(win, 0, x - 1, "+");
+        mvwprintw(win, y - 1, x - 1, "+");
+        for (i = 1; i < (y - 1); i++)
+        {
+            mvwprintw(win, i, 0, "|");
+            mvwprintw(win, i, x - 1, "|");
+        }
+        for (i = 1; i < (x - 1); i++)
+        {
+            mvwprintw(win, 0, i, "-");
+            mvwprintw(win, y - 1, i, "-");
+        }
+    }
 void main()
 {
 
-    const int MAXSIZE = 35;
+    const int MAXSIZE = 17;
     const int OPTIONS = 15;
+    const int PADDINGTOP = 1;
     const int MARGINTOP = 3;
 
     const int FILEINDEX = 30;
-    const int PWDY = 29;
+    const int PWDY = 20;
 
     FILE *fptr;
     char command[50];
     char **currdir;
-    char optionInput[1];
     char option[10];
+    char macroOption[10];
     char pwd[100];
+    char newDirPath[100];
+    char newDirName[80];
     char **display;
 
-    int prevCol;
-    int prevRow;
+    char shortcut[3][10] = {"MKDIR", "HOME", "STAR"};
 
     /*ncurses Initial setup*/
     WINDOW *w_exp;
+    WINDOW *w_command;
+    WINDOW *w_info;
+    WINDOW *w_macros;
     initscr();
-    w_exp = newwin(MAXSIZE, 50, 1, 1);
+    w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1);
+    w_command = newwin(1, 30, 0, 21);
+    w_info = newwin(8, 30, 20, 2);
+    w_macros = newwin(3, 20, 0, 3);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
     start_color();
     init_pair(1, COLOR_CYAN, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);
 
 loadNewDir:
     system("");
@@ -66,6 +94,7 @@ loadNewDir:
 loadPage:
     wclear(w_exp);
     wrefresh(w_exp);
+    wrefresh(w_command);
     currSection;
     int i;
 
@@ -104,12 +133,6 @@ loadPage:
     }
 
 resizeRefresh:
-    /*Option attribute prep*/
-    wattroff(w_exp, A_BOLD);
-    wattron(w_exp, A_UNDERLINE | COLOR_PAIR(2));
-    mvwprintw(w_exp, PWDY, 0, pwd);
-    wattroff(w_exp, A_UNDERLINE);
-
     /*Current dir listings*/
     for (int n = 0; n <= OPTIONS; n++)
     {
@@ -129,28 +152,51 @@ resizeRefresh:
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
         sprintf(option, "%s", display[n]);
-        mvwprintw(w_exp, n + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, n + PADDINGTOP, 2, "%s", option);
     }
 
     /*Current location*/
-    // wattroff(w_exp, A_BOLD);
-    wattron(w_exp, COLOR_PAIR(2));
-    mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
-    wattron(w_exp, COLOR_PAIR(1));
+    wattron(w_exp, COLOR_PAIR(1)); 
+    wattron(w_info, COLOR_PAIR(2)); 
+    wattron(w_command, COLOR_PAIR(3) | A_BOLD);
+    wattron(w_macros, A_BOLD | A_UNDERLINE);
+    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+    mvwprintw(w_info, 1, 0, "%s", pwd);
+    mvwprintw(w_command, 0, 0, "Command:");
+    for(int i=0; i<3; i++){
+        if(i==0){
+            wattron(w_macros, A_STANDOUT);
+        } else {
+            wattroff(w_macros, A_STANDOUT);
+            sprintf(macroOption, "%s", shortcut[i]);
+            mvwprintw(w_macros, 0,i*6, "%s", macroOption);
+        }
+    }
+    wrefresh(w_exp); 
+    wrefresh(w_info); 
+    wrefresh(w_command);
+    wrefresh(w_macros);
 
-    wrefresh(w_exp);
     int ch = 0; //user input
     char *token;
+    int topOption = 0;
+    int commandFlag;
 
     while (ch = wgetch(w_exp))
     {
+        sprintf(macroOption, "%s", shortcut[topOption]);
+        mvwprintw(w_macros, 0, topOption*6, "%s", macroOption);
+        wrefresh(w_macros);
+
         sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
+        wrefresh(w_command);
         switch (ch)
         {
         case KEY_UP:
             i--;
             currPoint--;
+            commandFlag = 0;
             if (i == -1 && currPoint == -1)
             {
                 i = 0;
@@ -165,6 +211,7 @@ resizeRefresh:
         case KEY_DOWN:
             i++;
             currPoint++;
+            commandFlag = 0;
             if ((i > (p % OPTIONS)) && (currPoint > p))
             {
                 i = (p % OPTIONS);
@@ -175,12 +222,42 @@ resizeRefresh:
                 goto loadPage;
             }
             break;
+        
+        case 0x9:
+            topOption++;
+            commandFlag = 1;
+            topOption = (topOption > 2) ? 0: topOption;
+            break;
+        case 0x20:
+            if (topOption == 0) {
+                /* code */
+                echo();
+                token = strtok(pwd, "\n");
+                strcpy(newDirPath, token);
+                getstr(newDirName);
+                token = strtok(newDirName, "\n");
+                strcat(newDirPath, "/");
+                strcat(newDirPath, newDirName);
+                mvwprintw(w_info,5,0,"%s", newDirPath);
+                wrefresh(w_info);
+                wclear(w_macros);
+                mkdir(newDirPath, 0777);
+                noecho();
+                goto loadNewDir;
+                break;
+            } else if(topOption == 1){
+                //need to get hostname
+                chdir("/home");
+                goto loadNewDir;
+            }
+            
+
         case 0x0A:                            //Enter key (not numpad)
             token = strtok(display[i], "\n"); //parsing for expls (removes newline)
             if (isDir(token) || strcmp(token, "..") == 0)
             {
                 chdir(display[i]);
-                //Reset screen completely
+                //Reset win completely
                 wclear(w_exp);
                 wrefresh(w_exp);
                 free(currdir);
@@ -200,10 +277,57 @@ resizeRefresh:
 
         /*Update options accordingly after option input*/
 
+        wattron(w_macros, A_STANDOUT);
+        sprintf(option, "%s", shortcut[topOption]);
+        mvwprintw(w_macros, 0, topOption*6, "%s", option);
+        wattroff(w_macros, A_STANDOUT);
+        wrefresh(w_macros);
+        
+        wattron(w_command, COLOR_PAIR(3) | A_BOLD);
+        if (commandFlag == 0)
+        {
+            if (isFile(strtok(display[i], "\n")))
+            {
+                mvwprintw(w_command, 0, 0, "Command: gedit %s", display[i]);
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if (isDir(strtok(display[i], "\n")))
+            {
+                mvwprintw(w_command, 0, 0, "Command: cd %s", display[i]);
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+        }
+        else if (commandFlag == 1){
+            if (topOption == 0)
+            {
+                mvwprintw(w_command, 0, 0, "Command: mkdir 'DirectoryName'");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if (topOption == 1)
+            {
+                mvwprintw(w_command, 0, 0, "Command: $HOME");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+            else if(topOption == 2)
+            {
+                mvwprintw(w_command, 0, 0, "Command: Missing");
+                wrefresh(w_command);
+                wclear(w_command);
+            }
+        }
+
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
-        mvwprintw(w_exp, FILEINDEX, 0, "File: %d/%d", currPoint, p);
+        wclear(w_info);
+        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+        mvwprintw(w_info, 1, 0, "%s", pwd);
         wattron(w_exp, A_STANDOUT);
+        wrefresh(w_info);
+
         if (isFile(strtok(display[i], "\n")))
         {
             wattron(w_exp, COLOR_PAIR(2));
@@ -214,7 +338,7 @@ resizeRefresh:
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
         sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + MARGINTOP, 2, "%s", option);
+        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
         wattroff(w_exp, A_STANDOUT | A_UNDERLINE);
     }
     endwin();
