@@ -5,25 +5,6 @@
 
 #include "./utils/explorer.h"
 
-// void draw_borders(WINDOW * win)
-// {
-//     int x, y, i;
-//     getmaxyx(win, y, x);
-//     mvwprintw(win, 0, 0, "+");
-//     mvwprintw(win, y - 1, 0, "+");
-//     mvwprintw(win, 0, x - 1, "+");
-//     mvwprintw(win, y - 1, x - 1, "+");
-//     for (i = 1; i < (y - 1); i++)
-//     {
-//         mvwprintw(win, i, 0, "|");
-//         mvwprintw(win, i, x - 1, "|");
-//     }
-//     for (i = 1; i < (x - 1); i++)
-//     {
-//         mvwprintw(win, 0, i, "-");
-//         mvwprintw(win, y - 1, i, "-");
-//     }
-// }
 void main()
 {
 
@@ -53,12 +34,14 @@ void main()
     WINDOW *w_info;
     WINDOW *w_macros;
     WINDOW *w_form;
+    WINDOW *w_help;
     initscr();
-    w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1); //Interactive file explorer(Center; left) 
-    w_command = newwin(1, 30, 0, 21); //Command required to execute(Top; right)
-    w_info = newwin(8, 30, 22, 2); //Info on FE(Bottom; left)
-    w_macros = newwin(3, 20, 0, 3); //QuickCommands(Top; left)
+    w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1); //Interactive file explorer(Center; left)
+    w_command = newwin(1, 30, 0, 21);          //Command required to execute(Top; right)
+    w_info = newwin(8, 50, 20, 2);             //Info on FE(Bottom; left)
+    w_macros = newwin(3, 20, 0, 3);            //QuickCommands(Top; left)
     w_form = newwin(1, 50, 20, 2);
+    w_help = newwin(50, 100, 0, 2);
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
@@ -166,6 +149,7 @@ resizeRefresh:
     wattron(w_macros, A_BOLD | A_UNDERLINE);
     mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
     mvwprintw(w_info, 1, 0, "%s", pwd);
+    mvwprintw(w_info, 2, 0, "Press 'h' for help");
     mvwprintw(w_command, 0, 0, "Command:");
     /*QuickCommand Menu*/
     for (int i = 0; i < 3; i++)
@@ -186,10 +170,10 @@ resizeRefresh:
     wrefresh(w_command);
     wrefresh(w_macros);
 
-    int ch = 0; //user input
-    char *token; //Store Parsed string
+    int ch = 0;        //user input
+    char *token;       //Store Parsed string
     int topOption = 0; //Quick Command option
-    int commandFlag; //What menu to display command from
+    int commandFlag;   //What menu to display command from
 
     while (ch = wgetch(w_exp))
     {
@@ -245,7 +229,7 @@ resizeRefresh:
                 token = strtok(pwd, "\n");
                 strcpy(newDirPath, token);
                 mvwprintw(w_form, 0, 0, "New Directory: ");
-                wgetstr(w_form,newEntry);
+                wgetstr(w_form, newEntry);
                 strcat(newDirPath, "/");
                 strcat(newDirPath, newEntry);
                 mkdir(newDirPath, 0777);
@@ -265,7 +249,7 @@ resizeRefresh:
                 wattron(w_form, COLOR_PAIR(4));
                 echo();
                 mvwprintw(w_form, 0, 0, "New File: ");
-                wgetstr(w_form,newEntry);
+                wgetstr(w_form, newEntry);
                 touch(newEntry);
                 noecho();
                 wclear(w_form);
@@ -294,7 +278,36 @@ resizeRefresh:
         case KEY_RESIZE:
             wclear(w_exp);
             goto resizeRefresh;
+        
+        case 0x68:
+            clear();
+            refresh();
+            wclear(w_help);
+            wattron(w_help, COLOR_PAIR(1)| A_BOLD);
+            mvwprintw(w_help,2,2, "File Explorer:");
+            wattroff(w_help, COLOR_PAIR(1)| A_BOLD);
+            mvwprintw(w_help,4,2, "-Use the UP and Down Arrows to navigate the FileExplorer");
+            mvwprintw(w_help,6,2, "-Press Enter to open current FileExplorer Option");
+            
+            wattron(w_help, COLOR_PAIR(1)| A_BOLD);
+            mvwprintw(w_help,9,2, "Quick Commands:");
+            wattroff(w_help, COLOR_PAIR(1)| A_BOLD);
+            mvwprintw(w_help,11,2, "-Use the TAB to cycle through top menu");
+            mvwprintw(w_help,13,2, "-Press SpaceBar to execute current top menu option");
+            wattron(w_help,A_BLINK);
+            mvwprintw(w_help,20,0, "Press 'q' to quit helpscreen");
+            wattroff(w_help,A_BLINK);
+            wrefresh(w_help);
+            while(ch = wgetch(w_help)){
+                if (ch == 0x71) {
+                    /* code */
+                    wclear(w_help);
+                    wrefresh(w_help);
+                    goto loadNewDir;
+                }
+            }
         }
+
 
         /*Update options accordingly after option input*/
 
@@ -343,12 +356,13 @@ resizeRefresh:
             }
         }
 
-//Update and ensure File/Directory style stays consistent
+        //Update and ensure File/Directory style stays consistent
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
         wclear(w_info);
         mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
         mvwprintw(w_info, 1, 0, "%s", pwd);
+        mvwprintw(w_info, 2, 0, "Press 'h' for help");
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
