@@ -17,7 +17,6 @@ void main()
     const int PWDY = 20;
 
     FILE *fptr;
-    char command[50];
     char **currdir;
     char option[10];
     char macroOption[10];
@@ -40,7 +39,7 @@ void main()
     w_command = newwin(1, 30, 0, 21);          //Command required to execute(Top; right)
     w_info = newwin(8, 50, 20, 2);             //Info on FE(Bottom; left)
     w_macros = newwin(3, 20, 0, 3);            //QuickCommands(Top; left)
-    w_form = newwin(1, 50, 20, 2);
+    w_form = newwin(1, 60, 20, 2);
     w_help = newwin(50, 100, 0, 2);
     noecho();
     curs_set(FALSE);
@@ -70,8 +69,7 @@ loadNewDir:
     strcpy(pwd, exppwd(fptr));
 
     /*Revised ls that returns ttl file count*/
-    strcpy(command, "/bin/ls");
-    int p = expls(fptr, command, currdir) - 1;
+    int p = expls(fptr, "/bin/ls", currdir) - 1;
     //Track options section in currdir array (All files)
     int currSection = 0;
     int currPoint = 0;
@@ -82,6 +80,7 @@ loadPage:
     wclear(w_exp);
     wrefresh(w_exp);
     wrefresh(w_command);
+
     currSection;
     int i;
 
@@ -224,6 +223,9 @@ resizeRefresh:
         case 0x20: //SpaceBar
             if (topOption == 0)
             {
+                wclear(w_command);
+                mvwprintw(w_command, 0, 0, "Command: mkdir 'Directory'");
+                wrefresh(w_command);
                 wattron(w_form, COLOR_PAIR(4));
                 echo();
                 token = strtok(pwd, "\n");
@@ -246,6 +248,9 @@ resizeRefresh:
             }
             else if (topOption == 2)
             {
+                wclear(w_command);
+                mvwprintw(w_command, 0, 0, "Command: touch 'fileName'");
+                wrefresh(w_command);
                 wattron(w_form, COLOR_PAIR(4));
                 echo();
                 mvwprintw(w_form, 0, 0, "New File: ");
@@ -256,6 +261,55 @@ resizeRefresh:
                 wrefresh(w_form);
                 goto loadNewDir;
             }
+        case 0x72:
+            token = strtok(display[i], "\n"); //parsing for expls (removes newline)
+            char remF[100];
+            char answer[10];
+
+            if (isDir(token))
+            {
+                wclear(w_command);
+                mvwprintw(w_command, 0, 0, "Command: rm -rf %s", display[i]);
+                wrefresh(w_command);
+                strcpy(remF, "rm -rf ");
+                strcat(remF, token);
+                wattron(w_form, COLOR_PAIR(4));
+                echo();
+                mvwprintw(w_form, 0, 0, "Type 'YeS' to delete %s or 'no' to exit. ", token);
+                wgetstr(w_form, answer);
+                noecho();
+                if (strcmp(answer, "YeS") == 0)
+                {
+                    system(remF);
+                }
+                else
+                {
+                    goto loadNewDir;
+                }
+                goto loadNewDir; //Jump to start but load new files
+            }
+            else if (isFile(token))
+            {
+                wclear(w_command);
+                mvwprintw(w_command, 0, 0, "Command: rm %s", display[i]);
+                wrefresh(w_command);
+                strcpy(remF, "rm ");
+                strcat(remF, token);
+                wattron(w_form, COLOR_PAIR(4));
+                echo();
+                mvwprintw(w_form, 0, 0, "Type 'YeS' to delete %s or 'no' to exit. ", token);
+                wgetstr(w_form, answer);
+                noecho();
+                if (strcmp(answer, "YeS") == 0)
+                {
+                    system(remF);
+                }
+                else
+                {
+                    goto loadNewDir;
+                }
+            }
+            goto loadNewDir; //Jump to start but load new files
 
         case 0x0A:                            //Enter key (not numpad)
             token = strtok(display[i], "\n"); //parsing for expls (removes newline)
@@ -278,28 +332,31 @@ resizeRefresh:
         case KEY_RESIZE:
             wclear(w_exp);
             goto resizeRefresh;
-        
+
         case 0x68:
             clear();
             refresh();
             wclear(w_help);
-            wattron(w_help, COLOR_PAIR(1)| A_BOLD);
-            mvwprintw(w_help,2,2, "File Explorer:");
-            wattroff(w_help, COLOR_PAIR(1)| A_BOLD);
-            mvwprintw(w_help,4,2, "-Use the UP and Down Arrows to navigate the FileExplorer");
-            mvwprintw(w_help,6,2, "-Press Enter to open current FileExplorer Option");
-            
-            wattron(w_help, COLOR_PAIR(1)| A_BOLD);
-            mvwprintw(w_help,9,2, "Quick Commands:");
-            wattroff(w_help, COLOR_PAIR(1)| A_BOLD);
-            mvwprintw(w_help,11,2, "-Use the TAB to cycle through top menu");
-            mvwprintw(w_help,13,2, "-Press SpaceBar to execute current top menu option");
-            wattron(w_help,A_BLINK);
-            mvwprintw(w_help,20,0, "Press 'q' to quit helpscreen");
-            wattroff(w_help,A_BLINK);
+            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 2, 2, "File Explorer:");
+            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 4, 2, "-Use the UP and Down Arrows to navigate the FileExplorer");
+            mvwprintw(w_help, 6, 2, "-Press Enter to open current FileExplorer Option");
+
+            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 9, 2, "Quick Commands:");
+            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 11, 2, "-Use the TAB to cycle through top menu");
+            mvwprintw(w_help, 13, 2, "-Press SpaceBar to execute current top menu option");
+            mvwprintw(w_help, 13, 2, "-Press 'r' to delete a File or Directory");
+            wattron(w_help, A_BLINK);
+            mvwprintw(w_help, 20, 0, "Press 'q' to quit helpscreen");
+            wattroff(w_help, A_BLINK);
             wrefresh(w_help);
-            while(ch = wgetch(w_help)){
-                if (ch == 0x71) {
+            while (ch = wgetch(w_help))
+            {
+                if (ch == 0x71)
+                {
                     /* code */
                     wclear(w_help);
                     wrefresh(w_help);
@@ -307,7 +364,6 @@ resizeRefresh:
                 }
             }
         }
-
 
         /*Update options accordingly after option input*/
 
