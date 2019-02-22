@@ -12,17 +12,20 @@
 Input: FILE *ptr, bash command, string[]
 Output: Int, pass by reference & number of elements  
 */
-int expls(FILE *fp, char * command, char **currdir){
+int expls(FILE *fp, char *command, char **currdir)
+{
 
     strcpy(currdir[0], "..");
     char path[1024];
     fp = popen(command, "r");
-    if (fp == NULL){
+    if (fp == NULL)
+    {
         exit(1);
     }
     int i = 1;
-    while(fgets(path, sizeof(path)-1, fp) != NULL){
-        strcpy(currdir[i],path);
+    while (fgets(path, sizeof(path) - 1, fp) != NULL)
+    {
+        strcpy(currdir[i], path);
         i++;
     }
     pclose(fp);
@@ -31,16 +34,18 @@ int expls(FILE *fp, char * command, char **currdir){
 /* chdir alias
 Input: char* directory
 */
-void expcd(char * dir){
+void expcd(char *dir)
+{
     chdir(dir);
 }
 
-char* exppwd(FILE *fp){
+char *exppwd(FILE *fp)
+{
     char pwd[100];
     fp = popen("/bin/pwd", "r");
-    char* path = (fgets(pwd, sizeof(pwd)-1, fp));
+    char *path = (fgets(pwd, sizeof(pwd) - 1, fp));
     pclose(fp);
-    return(path);
+    return (path);
 }
 
 /*
@@ -52,9 +57,12 @@ _Bool isFile(const char *name)
     struct stat file_stat;
     stat(name, &file_stat);
     int fileType = S_ISREG(file_stat.st_mode);
-    if(fileType == 1){
+    if (fileType == 1)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
         return 0;
     }
 }
@@ -68,9 +76,19 @@ _Bool isDir(const char *name)
     struct stat dir_stat;
     stat(name, &dir_stat);
     int fileType = S_ISDIR(dir_stat.st_mode);
-    if(fileType == 1){
+    if (fileType == 1)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
         return 0;
     }
+}
+
+void touch(const char *fileName)
+{
+    char newFile[100] = {"touch "};
+    strcat(newFile, fileName);
+    system(newFile);
 }
