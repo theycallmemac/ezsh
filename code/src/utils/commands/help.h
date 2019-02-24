@@ -10,8 +10,9 @@ int getHelp(char **args) {
         return 1;
     } else {
         char command[100];
-        snprintf(command, sizeof(command), "echo && man %s | grep -A 1 NAME |  sed 's/^[ \t]*//;s/[ \t]*$//' | sed -n '1!p' && echo", args[1]);
+        snprintf(command, sizeof(command), "echo && man %s | grep -A 1 NAME | sed 's/^[ \t]*//;s/[ \t]*$//' | sed -n '1!p' | sed -n '1,1p'", args[1]);
         system(command);
+        printf("\n");
         return 0;
     }
 }
