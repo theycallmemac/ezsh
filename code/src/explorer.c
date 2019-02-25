@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "./utils/explorer.h"
+#include "./utils/commands/cd.h"
 
 void main()
 {
@@ -247,7 +248,7 @@ resizeRefresh:
             else if (topOption == 1)
             {
                 //need to get hostname
-                chdir("/home");
+                chdir(changeHome());
                 goto loadNewDir;
             }
             else if (topOption == 2)
