@@ -34,29 +34,12 @@ void main()
     WINDOW *w_macros;
     WINDOW *w_form;
     WINDOW *w_help;
-    initscr();
-    w_exp = newwin(MAXSIZE, 40, MARGINTOP, 1); //Interactive file explorer(Center; left)
-    w_command = newwin(1, 30, 0, 21);          //Command required to execute(Top; right)
-    w_info = newwin(8, 50, 20, 2);             //Info on FE(Bottom; left)
-    w_macros = newwin(3, 20, 0, 3);            //QuickCommands(Top; left)
-    w_form = newwin(1, 60, 20, 2);
-    w_help = newwin(50, 100, 0, 2);
-    noecho();
-    curs_set(FALSE);
-    keypad(w_exp, TRUE);
-    start_color();
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);
-    init_pair(2, COLOR_WHITE, COLOR_BLACK);
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);
-    init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+    int p;
 
 loadNewDir:
-    /*MessagePassing to prompt*/
-    system("");
-    char *dirMsg = "YELL='\033[1;33m' && WHITE='\033[0m' && CDVAR='cd ' && echo ${YELL}'Command -->' ${WHITE}$CDVAR$PWD > $(tail -1 ~/.ezsh/.ezsh.tty)\n";
-    system(dirMsg);
-
-    /*Allocate memory for currdir*/
+    initscr();
+    
+        /*Allocate memory for currdir*/
     currdir = malloc(100 * sizeof(char *));
     for (int i = 0; i < 100; i++)
     {
@@ -65,11 +48,32 @@ loadNewDir:
             perror("ezsh");
         }
     }
+    p = expls(fptr, "/bin/ls", currdir)-1;
+    w_exp = newwin(p+2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
+    w_command = newwin(2, 30, 0, 21);           //Command required to execute(Top; right)
+    w_info = newwin(8, 50, 20, 2);              //Info on FE(Bottom; left)
+    w_macros = newwin(3, 20, 0, 3);             //QuickCommands(Top; left)
+    w_form = newwin(1, 60, 20, 2);
+    w_help = newwin(50, 100, 0, 2);
+    
+    noecho();
+    curs_set(FALSE);
+    keypad(w_exp, TRUE);
+    start_color();
+    
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);
+    init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+
+    /*MessagePassing to prompt*/
+    system("");
+    char *dirMsg = "YELL='\033[1;33m' && WHITE='\033[0m' && CDVAR='cd ' && echo ${YELL}'Command -->' ${WHITE}$CDVAR$PWD > $(tail -1 ~/.ezsh/.ezsh.tty)\n";
+    system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
 
     /*Revised ls that returns ttl file count*/
-    int p = expls(fptr, "/bin/ls", currdir) - 1;
     //Track options section in currdir array (All files)
     int currSection = 0;
     int currPoint = 0;
@@ -333,7 +337,7 @@ resizeRefresh:
             wclear(w_exp);
             goto resizeRefresh;
 
-        case 0x68:
+        case 0x68: // Hex for 'h'; display help screen
             clear();
             refresh();
             wclear(w_help);
@@ -348,7 +352,7 @@ resizeRefresh:
             wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
             mvwprintw(w_help, 11, 2, "-Use the TAB to cycle through top menu");
             mvwprintw(w_help, 13, 2, "-Press SpaceBar to execute current top menu option");
-            mvwprintw(w_help, 13, 2, "-Press 'r' to delete a File or Directory");
+            mvwprintw(w_help, 15, 2, "-Press 'r' to delete a File or Directory");
             wattron(w_help, A_BLINK);
             mvwprintw(w_help, 20, 0, "Press 'q' to quit helpscreen");
             wattroff(w_help, A_BLINK);
@@ -418,7 +422,10 @@ resizeRefresh:
         wclear(w_info);
         mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
         mvwprintw(w_info, 1, 0, "%s", pwd);
+        wattron(w_info, A_BLINK | A_BOLD | COLOR_PAIR(3));
         mvwprintw(w_info, 2, 0, "Press 'h' for help");
+        wattroff(w_info, A_BLINK | A_BOLD);
+        wattron(w_info, COLOR_PAIR(2));
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
