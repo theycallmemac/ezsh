@@ -39,29 +39,23 @@ void main()
 
 loadNewDir:
     initscr();
-    
-        /*Allocate memory for currdir*/
-    currdir = malloc(100 * sizeof(char *));
-    for (int i = 0; i < 100; i++)
-    {
-        if ((currdir[i] = malloc(1000)) == NULL)
-        {
-            perror("ezsh");
-        }
-    }
-    p = expls(fptr, "/bin/ls", currdir)-1;
-    w_exp = newwin(p+2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
-    w_command = newwin(2, 30, 0, 21);           //Command required to execute(Top; right)
-    w_info = newwin(8, 50, 20, 2);              //Info on FE(Bottom; left)
-    w_macros = newwin(3, 20, 0, 3);             //QuickCommands(Top; left)
+
+    /*Allocate memory for currdir*/
+    currdir = mallocStrArr(100, 100);
+
+    p = expls(fptr, "/bin/ls", currdir) - 1;
+    w_exp = newwin(p + 2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
+    w_command = newwin(2, 30, 0, 21);         //Command required to execute(Top; right)
+    w_info = newwin(8, 50, 20, 2);            //Info on FE(Bottom; left)
+    w_macros = newwin(3, 20, 0, 3);           //QuickCommands(Top; left)
     w_form = newwin(1, 60, 20, 2);
     w_help = newwin(50, 100, 0, 2);
-    
+
     noecho();
     curs_set(FALSE);
     keypad(w_exp, TRUE);
     start_color();
-    
+
     init_pair(1, COLOR_CYAN, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
     init_pair(3, COLOR_GREEN, COLOR_BLACK);
@@ -83,25 +77,17 @@ loadNewDir:
 
 loadPage:
     wclear(w_exp);
-    wrefresh(w_exp);
-    wrefresh(w_command);
+    refresh();
 
     currSection;
-    int i;
+    int optionIndex;
 
-    display = malloc(100 * sizeof(char *));
-    for (int i = 0; i < 100; i++)
-    {
-        if ((display[i] = malloc(100)) == NULL)
-        {
-            perror("ezsh");
-        }
-    }
+    display = mallocStrArr(100, 100);
 
     /*Load next n OPTIONS on menu, set selected option to top file*/
     if (forward_flag)
     {
-        i = 0;
+        optionIndex = 0;
         for (int j = 0; j < OPTIONS; j++)
         {
             strcpy(display[j], currdir[currSection]);
@@ -112,7 +98,7 @@ loadPage:
          set selected option to bottom file*/
     else
     {
-        i = 14;
+        optionIndex = 14;
         currSection -= 30;
         forward_flag = 1;
         for (int j = 0; j < OPTIONS; j++)
@@ -127,7 +113,6 @@ resizeRefresh:
     /*Current dir listings*/
     for (int n = 0; n <= OPTIONS; n++)
     {
-        wattron(w_exp, A_STANDOUT);
         wattroff(w_exp, A_STANDOUT);
         if (n == 0 && currPoint == 0)
         {
@@ -147,75 +132,70 @@ resizeRefresh:
     }
 
     /*Current position in directory*/
-    wattron(w_exp, COLOR_PAIR(1));
-    wattron(w_info, COLOR_PAIR(2));
     wattron(w_command, COLOR_PAIR(3) | A_BOLD);
     wattron(w_macros, A_BOLD | A_UNDERLINE);
     mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
     mvwprintw(w_info, 1, 0, "%s", pwd);
     mvwprintw(w_info, 2, 0, "Press 'h' for help");
     mvwprintw(w_command, 0, 0, "Command:");
+
     /*QuickCommand Menu*/
-    for (int i = 0; i < 3; i++)
+    for (int optionIndex = 0; optionIndex < 3; optionIndex++)
     {
-        if (i == 0)
-        {
-            wattron(w_macros, A_STANDOUT);
-        }
-        else
+        if (optionIndex != 0)
         {
             wattroff(w_macros, A_STANDOUT);
-            sprintf(macroOption, "%s", shortcut[i]);
-            mvwprintw(w_macros, 0, i * 6, "%s", macroOption);
+            sprintf(macroOption, "%s", shortcut[optionIndex]);
+            mvwprintw(w_macros, 0, optionIndex * 6, "%s", macroOption);
         }
     }
-    wrefresh(w_exp);
-    wrefresh(w_info);
-    wrefresh(w_command);
-    wrefresh(w_macros);
+
+    refresh();
 
     int ch = 0;        //user input
     char *token;       //Store Parsed string
     int topOption = 0; //Quick Command option
     int commandFlag;   //What menu to display command from
 
-    while (ch = wgetch(w_exp))
+    do
     {
         sprintf(macroOption, "%s", shortcut[topOption]);
         mvwprintw(w_macros, 0, topOption * 6, "%s", macroOption);
-        wrefresh(w_macros);
 
-        sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
-        wrefresh(w_command);
+        sprintf(option, "%s", display[optionIndex]);
+        mvwprintw(w_exp, optionIndex + PADDINGTOP, 2, "%s", option);
+
+        refresh();
         switch (ch)
         {
         case KEY_UP:
-            i--;
+            optionIndex--;
             currPoint--;
             commandFlag = 0;
-            if (i == -1 && currPoint == -1)
+            if (optionIndex == -1 && currPoint == -1)
             {
-                i = 0;
+                optionIndex = 0;
                 currPoint = 0;
             }
-            if (i == -1)
+            if (optionIndex == -1)
             {
                 forward_flag = 0;
+
                 goto loadPage;
             }
             break;
         case KEY_DOWN:
-            i++;
+            optionIndex++;
             currPoint++;
             commandFlag = 0;
-            if ((i > (p % OPTIONS)) && (currPoint > p))
+            if ((optionIndex > (p % OPTIONS)) && (currPoint > p))
             {
-                i = (p % OPTIONS);
+                optionIndex = (p % OPTIONS);
                 currPoint = p;
             }
-            if (i == OPTIONS)
+            if (optionIndex == OPTIONS)
             {
+
                 goto loadPage;
             }
             break;
@@ -243,12 +223,15 @@ resizeRefresh:
                 noecho();
                 wclear(w_form);
                 wrefresh(w_form);
+                free(currdir);
+                free(display);
                 goto loadNewDir;
             }
             else if (topOption == 1)
             {
-                //need to get hostname
                 chdir(changeHome());
+                free(currdir);
+                free(display);
                 goto loadNewDir;
             }
             else if (topOption == 2)
@@ -264,17 +247,19 @@ resizeRefresh:
                 noecho();
                 wclear(w_form);
                 wrefresh(w_form);
+                free(currdir);
+                free(display);
                 goto loadNewDir;
             }
         case 0x72:
-            token = strtok(display[i], "\n"); //parsing for expls (removes newline)
+            token = strtok(display[optionIndex], "\n"); //parsing for expls (removes newline)
             char remF[100];
             char answer[10];
 
             if (isDir(token))
             {
                 wclear(w_command);
-                mvwprintw(w_command, 0, 0, "Command: rm -rf %s", display[i]);
+                mvwprintw(w_command, 0, 0, "Command: rm -rf %s", display[optionIndex]);
                 wrefresh(w_command);
                 strcpy(remF, "rm -rf ");
                 strcat(remF, token);
@@ -289,14 +274,18 @@ resizeRefresh:
                 }
                 else
                 {
+                    free(currdir);
+                    free(display);
                     goto loadNewDir;
                 }
+                free(currdir);
+                free(display);
                 goto loadNewDir; //Jump to start but load new files
             }
             else if (isFile(token))
             {
                 wclear(w_command);
-                mvwprintw(w_command, 0, 0, "Command: rm %s", display[i]);
+                mvwprintw(w_command, 0, 0, "Command: rm %s", display[optionIndex]);
                 wrefresh(w_command);
                 strcpy(remF, "rm ");
                 strcat(remF, token);
@@ -311,16 +300,20 @@ resizeRefresh:
                 }
                 else
                 {
+                    free(currdir);
+                    free(display);
                     goto loadNewDir;
                 }
             }
+            free(currdir);
+            free(display);
             goto loadNewDir; //Jump to start but load new files
 
-        case 0x0A:                            //Enter key (not numpad)
-            token = strtok(display[i], "\n"); //parsing for expls (removes newline)
+        case 0x0A:                                      //Enter key (not numpad)
+            token = strtok(display[optionIndex], "\n"); //parsing for expls (removes newline)
             if (isDir(token) || strcmp(token, "..") == 0)
             {
-                chdir(display[i]);
+                chdir(display[optionIndex]);
                 //Reset win completely
                 wclear(w_exp);
                 wrefresh(w_exp);
@@ -365,6 +358,8 @@ resizeRefresh:
                     /* code */
                     wclear(w_help);
                     wrefresh(w_help);
+                    free(currdir);
+                    free(display);
                     goto loadNewDir;
                 }
             }
@@ -379,18 +374,17 @@ resizeRefresh:
         wrefresh(w_macros);
 
         //What command to display in top right based of flag
-        wattron(w_command, COLOR_PAIR(3) | A_BOLD);
         if (commandFlag == 0)
         {
-            if (isFile(strtok(display[i], "\n")))
+            if (isFile(strtok(display[optionIndex], "\n")))
             {
-                mvwprintw(w_command, 0, 0, "Command: gedit %s", display[i]);
+                mvwprintw(w_command, 0, 0, "Command: gedit %s", display[optionIndex]);
                 wrefresh(w_command);
                 wclear(w_command);
             }
-            else if (isDir(strtok(display[i], "\n")))
+            else if (isDir(strtok(display[optionIndex], "\n")))
             {
-                mvwprintw(w_command, 0, 0, "Command: cd %s", display[i]);
+                mvwprintw(w_command, 0, 0, "Command: cd %s", display[optionIndex]);
                 wrefresh(w_command);
                 wclear(w_command);
             }
@@ -430,18 +424,17 @@ resizeRefresh:
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
-        if (isFile(strtok(display[i], "\n")))
+        if (isFile(strtok(display[optionIndex], "\n")))
         {
             wattron(w_exp, COLOR_PAIR(2));
             wattroff(w_exp, A_BOLD);
         }
-        else if (isDir(strtok(display[i], "\n")))
+        else if (isDir(strtok(display[optionIndex], "\n")))
         {
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
-        sprintf(option, "%s", display[i]);
-        mvwprintw(w_exp, i + PADDINGTOP, 2, "%s", option);
+        sprintf(option, "%s", display[optionIndex]);
+        mvwprintw(w_exp, optionIndex + PADDINGTOP, 2, "%s", option);
         wattroff(w_exp, A_STANDOUT | A_UNDERLINE);
-    }
-    endwin();
+    } while (ch = wgetch(w_exp));
 }
