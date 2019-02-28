@@ -15,6 +15,8 @@
 int ezshCD(char **args);
 int ezshHELP(char **args);
 int ezshHISTORY(char **args);
+int ezshSTAR(char **args);
+int ezshSAVE();
 int ezshEXIT();
 
 
@@ -29,27 +31,6 @@ char *builtinStr[] = {
     "exit"
 };
 
-
-// ezshSAVE is the function called from prompt.c when you use `save`
-// This makes the shell exit on a zero code
-int ezshSAVE() {
-    char line[20] =  "tmux detach";
-    char **saveShell = ezshSplitLine(line);
-    int status = ezshExecute(saveShell);
-    free(saveShell);
-    exit(status);
-}
-
-// ezshSTAR is the function called from prompt.c when you use `star`
-// This calls showStars() from star.h
-int ezshSTAR(char **args) {
-    if (args[1] == NULL) {
-        showStars();  
-    } else {
-        addStar(args[1]);
-    }
-    return 0;
-}
 
 // Store builtin functions here
 // These functions should be listed in order with their counterparts in the builtinStr above
@@ -90,6 +71,29 @@ int ezshHELP(char **args) {
 int ezshCD(char **args) {
     changeDir(args);
     return 1;
+}
+
+
+// ezshSAVE is the function called from prompt.c when you use `save`
+// This makes the shell exit on a zero code
+int ezshSAVE() {
+    char line[20] =  "tmux detach";
+    char **saveShell = ezshSplitLine(line);
+    int status = ezshExecute(saveShell);
+    free(saveShell);
+    exit(status);
+}
+
+
+// ezshSTAR is the function called from prompt.c when you use `star`
+// This calls showStars() from star.h
+int ezshSTAR(char **args) {
+    if (args[1] == NULL) {
+        showStars();  
+    } else {
+        addStar(args[1]);
+    }
+    return 0;
 }
 
 

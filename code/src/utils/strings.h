@@ -3,11 +3,18 @@ char *strrev(char *str) {
 
       if (! str || ! *str)
             return str;
-      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
-      {
+
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2) {
             *p1 ^= *p2;
             *p2 ^= *p1;
             *p1 ^= *p2;
       }
       return str;
+}
+
+char* trim(char* s) {
+    while(isspace(*s)) {
+        s++;
+    }
+    return s;
 }
