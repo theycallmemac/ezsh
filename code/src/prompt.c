@@ -10,7 +10,9 @@
 #include "utils/colour.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
+#include "utils/operators.h"
 #include "utils/systemFiles.h"
+
 
 // This function sets up the default prompt of ezsh
 // Takes three char arrays: uname (the name of the current user), cwd (the name of the currently working directory), and hostname (the name of the machine they are working on)
@@ -37,7 +39,7 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
 // This function takes no parameters
 // This function is of type void, so it returns nothing
 void ezshLoop(void) {
-    char *line = "";
+    char *line;
     char **args;
     int status;
     do {

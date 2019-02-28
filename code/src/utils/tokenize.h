@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdint.h>
 
 #define EZSH_TOKEN_BUFFSIZE 64
 #define EZSH_TOKEN_DELIMITER " \t\r\n\a"
@@ -16,23 +16,15 @@ void checkAllocation(char **tokens) {
     }
 }
 
+
 // This function gets a token from the line provided
 // The function returns said token, and takes a char* as a parameter
-char *getToken(char *line) {
-    char *token = strtok(line, EZSH_TOKEN_DELIMITER);
-    return token;
-}
-
-
-// This function tokenizes the line of input, one token at a time
-// This function makes use of both checkAllocation and getTokens()
-// The function takes a char* (line) and returns a char** (tokens)
-char **ezshSplitLine(char *line) {
+char **getTokens(char **tokens, char *line, char *d) {
     int buffsize = EZSH_TOKEN_BUFFSIZE, position = 0;
-    char **tokens = malloc(buffsize * sizeof(char*));
-    char *token;
+    tokens = malloc(buffsize * sizeof(char*));
     checkAllocation(tokens);
-    token = getToken(line);
+    char *token;
+    token = strtok(line, d);
     while (token != NULL) {
         tokens[position] = token;
         position++;
@@ -41,8 +33,26 @@ char **ezshSplitLine(char *line) {
             tokens = realloc(tokens, buffsize * sizeof(char*));
             checkAllocation(tokens);
         }
-        token = getToken(NULL);
+        token = strtok(NULL, d);
     }
     tokens[position] = NULL;
     return tokens;
 }
+
+
+// This function tokenizes the line of input, one token at a time
+// This function makes use of both checkAllocation and getTokens()
+// The function takes a char* (line) and returns a char** (tokens)
+char **ezshSplitLine(char *line) {
+    char **tokens;
+    char **fTokens;
+    if (strchr(line, '&')) {
+        tokens = getTokens(tokens, line, "&");
+        executeAnd(tokens);
+        return fTokens;
+    } else {
+        tokens = getTokens(tokens, line, EZSH_TOKEN_DELIMITER);
+        return tokens;
+    }
+}
+
