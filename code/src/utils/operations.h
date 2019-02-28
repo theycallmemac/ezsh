@@ -25,3 +25,20 @@ void executePipe(char **args){
         strcat(cmd, "|");
     }
 }
+
+
+void redirectSTDOUT(char **args){
+    int i;
+    char cmd[100];
+    for(i = 0; i < 10; i++) {
+        if (args[i] == NULL) {
+            break;
+        }
+        strcat(cmd, args[i]);
+        if (args[i+1] == NULL) {
+            system(cmd);
+        }
+        strcat(cmd, ">");
+    }
+}
+
