@@ -92,3 +92,15 @@ void touch(const char *fileName)
     strcat(newFile, fileName);
     system(newFile);
 }
+
+char** mallocStrArr(int arrSize, int strSize){
+    char** arr;
+    arr = malloc(arrSize * sizeof(char*));
+    for(int i = 0; i < arrSize; i++)
+    {
+        if ((arr[i]= malloc(strSize * sizeof(char*))) == NULL) {
+            perror("ezsh memalloc fail");
+        }
+    }
+    return arr;
+}
