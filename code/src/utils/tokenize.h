@@ -54,6 +54,10 @@ char **ezshSplitLine(char *line) {
         tokens = getTokens(tokens, line, "|");
         executePipe(tokens);
         return fTokens;
+     } else if (strchr(line, '>')) {
+        tokens = getTokens(tokens, line, ">");
+        redirectSTDOUT(tokens);
+        return fTokens;   
     } else {
         tokens = getTokens(tokens, line, EZSH_TOKEN_DELIMITER);
         return tokens;

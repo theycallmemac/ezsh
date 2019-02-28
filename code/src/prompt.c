@@ -10,7 +10,7 @@
 #include "utils/colour.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
-#include "utils/operators.h"
+#include "utils/operations.h"
 #include "utils/systemFiles.h"
 
 
