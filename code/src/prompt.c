@@ -55,6 +55,17 @@ void ezshLoop(void) {
         }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
+        char dirMsg[300];
+        strcat(dirMsg, "YELL='\033[1;33m' && WHITE='\033[0m'&& echo ${YELL}'Command -->' ${WHITE}");
+        for (int i = 0; i < 200; i++) {
+            if (args[i] == NULL) {
+                break;
+            }
+            strcat(dirMsg, args[i]);
+            strcat(dirMsg, " ");
+        }
+        strcat(dirMsg, "> $(tail -1 ~/.ezsh/.ezsh.tty)\n");
+        system(dirMsg);
         free(line);
         free(args);
     } while (status); 
