@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-void executeAnd(char **args){
+int executeAnd(char **args){
     int i;
     for(i = 0; i < 10; i++) {
         if (args[i] == NULL) {
@@ -9,9 +9,10 @@ void executeAnd(char **args){
         char *arg = trim(args[i]);
         system(arg);
     }
+    return 0;
 }
 
-void executePipe(char **args){
+int executePipe(char **args){
     int i;
     char cmd[100];
     for(i = 0; i < 10; i++) {
@@ -24,10 +25,11 @@ void executePipe(char **args){
         }
         strcat(cmd, "|");
     }
+    return 0;
 }
 
 
-void redirectSTDOUT(char **args){
+int redirectSTDOUT(char **args){
     int i;
     char cmd[100];
     for(i = 0; i < 10; i++) {
@@ -40,5 +42,6 @@ void redirectSTDOUT(char **args){
         }
         strcat(cmd, ">");
     }
+    return 0;
 }
 
