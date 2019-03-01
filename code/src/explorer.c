@@ -2,9 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h> 
 
 #include "./utils/explorer.h"
 #include "./utils/commands/cd.h"
+
+void pipeWrite(char* msg){
+    int pipeFile;
+    char * pipePath = "/tmp/ezshMsgPasser";
+    pipeFile = open(pipePath, O_WRONLY);
+    write(pipeFile, msg, strlen(msg)+1);
+    close(pipeFile);
+}
 
 void main()
 {
@@ -35,7 +44,11 @@ void main()
     WINDOW *w_macros;
     WINDOW *w_form;
     WINDOW *w_help;
+    
     int p;
+    int pipeFile;
+    char * pipePath = "/tmp/ezshMsgPasser";
+    mkfifo(pipePath, 0666);
 
 loadNewDir:
     initscr();
@@ -67,6 +80,7 @@ loadNewDir:
     system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
+    pipeWrite(strtok(pwd,"\n"));
 
     /*Revised ls that returns ttl file count*/
     //Track options section in currdir array (All files)
@@ -74,6 +88,7 @@ loadNewDir:
     int currPoint = 0;
     //Discern whether user wants to load next page or last page
     bool forward_flag = 1;
+
 
 loadPage:
     wclear(w_exp);

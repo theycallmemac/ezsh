@@ -19,7 +19,7 @@ INFO = info
 all:	$(PROMPT) $(EXP) $(INFO)
 
 $(PROMPT): $(PROMPT_OBJ)
-		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
+		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline -pthread
 
 $(EXP): $(EXP_OBJ)
 		gcc -o $(EXP) $(EXP_OBJ) -lncurses

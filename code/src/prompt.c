@@ -6,6 +6,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <fcntl.h> 
+#include <pthread.h>
 
 #include "utils/colour.h"
 #include "utils/tokenize.h"
@@ -34,6 +36,17 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
     return "";
 }
 
+void pipeRead(void){
+    int pipeFile;
+        char pwd[100];
+        char *command = "cd";
+        char * pipePath = "/tmp/ezshMsgPasser";
+        pipeFile = open(pipePath, O_RDONLY);
+        read(pipeFile, pwd, 100);
+        printf("%s\n", pwd);
+        chdir(pwd);
+        close(pipeFile);
+}
 
 // This function runs a loop consisting of: read, tokenize, and execute
 // This function takes no parameters
@@ -42,6 +55,8 @@ void ezshLoop(void) {
     char *line;
     char **args;
     int status;
+    pthread_t msglstnr;
+    int msg;
     do {
         char cwd[1024];
         char hostname[1024];
@@ -55,6 +70,7 @@ void ezshLoop(void) {
         }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
+        msg = pthread_create(&msg, NULL, pipeRead, NULL);
         free(line);
         free(args);
     } while (status); 
@@ -78,10 +94,17 @@ void handler(int signal) {
 // Returns type int, EXIT_SUCCESS 
 int main(int argc, char **argv) {
     int keepRunning = 1;
+    char * pipePath = "/tmp/.ezshMsgPasser";
+
+    // pthread_t inputlstnr;
+    // int input;
+
+    mkfifo(pipePath, 0666);
     signal(SIGINT, handler);
     rl_bind_key('\t', rl_complete);
     checkFiles();
     while (keepRunning) {
+        // input = pthread_create(&input,NULL,ezshLoop, NULL);
         ezshLoop();
     }
     return EXIT_SUCCESS;
