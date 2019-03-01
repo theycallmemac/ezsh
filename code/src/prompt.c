@@ -42,7 +42,9 @@ void ezshLoop(void) {
     char *line;
     char **args;
     int status;
+    char *dirMsg;
     do {
+        dirMsg = (char *)malloc(300);
         char cwd[1024];
         char hostname[1024];
         gethostname(hostname, 1024);
@@ -55,7 +57,6 @@ void ezshLoop(void) {
         }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
-        char dirMsg[300];
         strcat(dirMsg, "YELL='\033[1;33m' && WHITE='\033[0m'&& echo ${YELL}'Command -->' ${WHITE}");
         for (int i = 0; i < 200; i++) {
             if (args[i] == NULL) {
@@ -66,6 +67,7 @@ void ezshLoop(void) {
         }
         strcat(dirMsg, "> $(tail -1 ~/.ezsh/.ezsh.tty)\n");
         system(dirMsg);
+        free(dirMsg);
         free(line);
         free(args);
     } while (status); 

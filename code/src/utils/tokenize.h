@@ -44,19 +44,20 @@ char **getTokens(char **tokens, char *line, char *d) {
 // This function makes use of both checkAllocation and getTokens()
 // The function takes a char* (line) and returns a char** (tokens)
 char **ezshSplitLine(char *line) {
+    int status;
     char **tokens;
     char **fTokens;
     if (strchr(line, '&')) {
         tokens = getTokens(tokens, line, "&");
-        executeAnd(tokens);
+        status = executeAnd(tokens);
         return fTokens;
     } else if (strchr(line, '|')) {
         tokens = getTokens(tokens, line, "|");
-        executePipe(tokens);
+        status = executePipe(tokens);
         return fTokens;
      } else if (strchr(line, '>')) {
         tokens = getTokens(tokens, line, ">");
-        redirectSTDOUT(tokens);
+        status = redirectSTDOUT(tokens);
         return fTokens;   
     } else {
         tokens = getTokens(tokens, line, EZSH_TOKEN_DELIMITER);
