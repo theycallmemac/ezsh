@@ -41,11 +41,15 @@ void pipeRead(void){
         char pwd[100];
         char *command = "cd";
         char * pipePath = "/tmp/ezshMsgPasser";
+        while(1){
+            /* code */
         pipeFile = open(pipePath, O_RDONLY);
         read(pipeFile, pwd, 100);
         printf("%s\n", pwd);
         chdir(pwd);
         close(pipeFile);
+        }
+        
 }
 
 // This function runs a loop consisting of: read, tokenize, and execute
@@ -57,6 +61,7 @@ void ezshLoop(void) {
     int status;
     pthread_t msglstnr;
     int msg;
+        msg = pthread_create(&msg, NULL, pipeRead, NULL);
     do {
         char cwd[1024];
         char hostname[1024];
@@ -70,7 +75,6 @@ void ezshLoop(void) {
         }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
-        msg = pthread_create(&msg, NULL, pipeRead, NULL);
         free(line);
         free(args);
     } while (status); 
@@ -96,8 +100,8 @@ int main(int argc, char **argv) {
     int keepRunning = 1;
     char * pipePath = "/tmp/.ezshMsgPasser";
 
-    // pthread_t inputlstnr;
-    // int input;
+    pthread_t inputlstnr;
+    int input;
 
     mkfifo(pipePath, 0666);
     signal(SIGINT, handler);
