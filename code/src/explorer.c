@@ -2,18 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h> 
 
 #include "./utils/explorer.h"
 #include "./utils/commands/cd.h"
-
-void pipeWrite(char* msg){
-    int pipeFile;
-    char * pipePath = "/tmp/ezshMsgPasser";
-    pipeFile = open(pipePath, O_WRONLY);
-    write(pipeFile, msg, strlen(msg)+1);
-    close(pipeFile);
-}
+#include "./utils/panesync.h"
 
 void main()
 {
@@ -80,7 +72,7 @@ loadNewDir:
     system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
-    pipeWrite(strtok(pwd,"\n"));
+    pipeWrite(pwd);
 
     /*Revised ls that returns ttl file count*/
     //Track options section in currdir array (All files)

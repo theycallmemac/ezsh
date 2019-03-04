@@ -6,7 +6,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include <fcntl.h> 
 #include <pthread.h>
 
 #include "utils/colour.h"
@@ -14,6 +13,7 @@
 #include "utils/execute.h"
 #include "utils/operations.h"
 #include "utils/systemFiles.h"
+#include "utils/panesync.h"
 
 
 // This function sets up the default prompt of ezsh
@@ -34,22 +34,6 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[]) {
     reset();
     printf("╰ ");
     return "";
-}
-
-void pipeRead(void){
-    int pipeFile;
-        char pwd[100];
-        char *command = "cd";
-        char * pipePath = "/tmp/ezshMsgPasser";
-        while(1){
-            /* code */
-        pipeFile = open(pipePath, O_RDONLY);
-        read(pipeFile, pwd, 100);
-        printf("%s\n", pwd);
-        chdir(pwd);
-        close(pipeFile);
-        }
-        
 }
 
 // This function runs a loop consisting of: read, tokenize, and execute
