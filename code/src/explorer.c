@@ -71,7 +71,7 @@ loadNewDir:
     /*Allocate memory for currdir*/
     currdir = mallocStrArr(100, 100);
 
-    p = expls(fptr, "/bin/ls", currdir) - 1;
+    p = expls(fptr, currdir) - 1;
     w_exp = newwin(p + 2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
     w_command = newwin(2, 30, 0, 21);         //Command required to execute(Top; right)
     w_info = newwin(8, 50, 20, 2);            //Info on FE(Bottom; left)
@@ -149,12 +149,12 @@ resizeRefresh:
         {
             wattron(w_exp, COLOR_PAIR(1));
         }
-        else if (isFile(strtok(display[n], "\n")))
+        else if (isFile(display[n]))
         {
             wattron(w_exp, COLOR_PAIR(2));
             wattroff(w_exp, A_BOLD);
         }
-        else if (isDir(strtok(display[n], "\n")))
+        else if (isDir(display[n]))
         {
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
@@ -296,7 +296,7 @@ resizeRefresh:
             char remF[100];
             char answer[10];
 
-            if (isDir(token))
+            if (isDir(display[optionIndex]))
             {
                 wclear(w_command);
                 mvwprintw(w_command, 0, 0, "Command: rm -rf %s", display[optionIndex]);
@@ -324,7 +324,7 @@ resizeRefresh:
 
                 goto loadNewDir; //Jump to start but load new files
             }
-            else if (isFile(token))
+            else if (isFile(display[optionIndex]))
             {
                 wclear(w_command);
                 mvwprintw(w_command, 0, 0, "Command: rm %s", display[optionIndex]);
@@ -355,7 +355,7 @@ resizeRefresh:
 
         case 0x0A:                                      //Enter key (not numpad)
             token = strtok(display[optionIndex], "\n"); //parsing for expls (removes newline)
-            if (isDir(token) || strcmp(token, "..") == 0)
+            if (isDir(display[optionIndex]) || strcmp(token, "..") == 0)
             {
                 chdir(display[optionIndex]);
                 //Reset win completely
@@ -367,7 +367,7 @@ resizeRefresh:
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
-            else if (isFile(token) && !fork())
+            else if (isFile(display[optionIndex]) && !fork())
             {
                 execlp("gedit", "gedit", token, NULL);
                 break;
@@ -428,13 +428,13 @@ resizeRefresh:
         //What command to display in top right based of flag
         if (commandFlag == 0)
         {
-            if (isFile(strtok(display[optionIndex], "\n")))
+            if (isFile(display[optionIndex]))
             {
                 mvwprintw(w_command, 0, 0, "Command: gedit %s", display[optionIndex]);
                 wrefresh(w_command);
                 wclear(w_command);
             }
-            else if (isDir(strtok(display[optionIndex], "\n")))
+            else if (isDir(display[optionIndex]))
             {
                 mvwprintw(w_command, 0, 0, "Command: cd %s", display[optionIndex]);
                 wrefresh(w_command);
@@ -476,12 +476,12 @@ resizeRefresh:
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
-        if (isFile(strtok(display[optionIndex], "\n")))
+        if (isFile(display[optionIndex]))
         {
             wattron(w_exp, COLOR_PAIR(2));
             wattroff(w_exp, A_BOLD);
         }
-        else if (isDir(strtok(display[optionIndex], "\n")))
+        else if (isDir(display[optionIndex]))
         {
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }

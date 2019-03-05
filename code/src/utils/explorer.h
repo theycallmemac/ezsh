@@ -12,12 +12,12 @@
 Input: FILE *ptr, bash command, string[]
 Output: Int, pass by reference & number of elements  
 */
-int expls(FILE *fp, char *command, char **currdir)
+int expls(FILE *fp, char **currdir)
 {
 
     strcpy(currdir[0], "..");
     char path[1024];
-    fp = popen(command, "r");
+    fp = popen("/bin/ls", "r");
     if (fp == NULL)
     {
         exit(1);
@@ -56,7 +56,7 @@ Output: bool
 _Bool isFile(const char *name)
 {
     struct stat file_stat;
-    stat(name, &file_stat);
+    stat(strtok(name, "\n"), &file_stat);
     int fileType = S_ISREG(file_stat.st_mode);
     if (fileType == 1)
     {
@@ -75,7 +75,7 @@ Output: bool
 _Bool isDir(const char *name)
 {
     struct stat dir_stat;
-    stat(name, &dir_stat);
+    stat(strtok(name,"\n"), &dir_stat);
     int fileType = S_ISDIR(dir_stat.st_mode);
     if (fileType == 1)
     {
@@ -88,6 +88,8 @@ _Bool isDir(const char *name)
 }
 
 /*
+Create a file in the current directory: 
+const char *fileName: Name of the file to be created
 */
 void touch(const char *fileName)
 {
@@ -97,6 +99,9 @@ void touch(const char *fileName)
 }
 
 /*
+Allocate memory to a char** variable:
+arrSize: How many strings to be allocated
+strSize: Size of the largest string to be allocated
 */
 char** mallocStrArr(int arrSize, int strSize){
     char** arr;
