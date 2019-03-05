@@ -7,21 +7,22 @@
 
 #include "./utils/explorer.h"
 #include "./utils/commands/cd.h"
-#include "./utils/panesync.h"
 
 #define EXP2PROMPT "/tmp/exp2prompt"
 #define PROMPT2EXP "/tmp/prompt2exp"
 
-void pipeReadprompt(void){
+void pipeReadprompt(void)
+{
     int pipeFile;
     char pwd[100];
-    while(1){
+    while (1)
+    {
         pipeFile = open(PROMPT2EXP, O_RDONLY);
-        read(pipeFile, pwd, 100);     
+        read(pipeFile, pwd, 100);
         // mkdir("SomeTestShit", 0777);
-        chdir("..");
+        chdir(pwd);
         close(pipeFile);
-        }
+    }
 }
 
 void main()
@@ -53,7 +54,7 @@ void main()
     WINDOW *w_macros;
     WINDOW *w_form;
     WINDOW *w_help;
-    
+
     int p;
     int pipeFile;
     // char * pipePath = "/tmp/ezshMsgPasser";
@@ -62,7 +63,7 @@ void main()
     int msg;
     pthread_t msglstnr;
     msg = pthread_create(&msglstnr, NULL, pipeReadprompt, NULL);
-    
+
 loadNewDir:
 
     initscr();
@@ -94,7 +95,9 @@ loadNewDir:
     system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
-    pipeWrite(pwd, EXP2PROMPT);
+    pipeFile = open(EXP2PROMPT, O_WRONLY);
+    write(pipeFile, strtok(pwd, "\n"), strlen(pwd) + 1);
+    close(pipeFile);
 
     /*Revised ls that returns ttl file count*/
     //Track options section in currdir array (All files)
@@ -102,7 +105,6 @@ loadNewDir:
     int currPoint = 0;
     //Discern whether user wants to load next page or last page
     bool forward_flag = 1;
-
 
 loadPage:
     wclear(w_exp);
@@ -188,7 +190,7 @@ resizeRefresh:
 
     do
     {
-    
+
         sprintf(macroOption, "%s", shortcut[topOption]);
         mvwprintw(w_macros, 0, topOption * 6, "%s", macroOption);
 
@@ -235,8 +237,10 @@ resizeRefresh:
             commandFlag = 1;
             topOption = (topOption > 2) ? 0 : topOption;
             break;
-        
-        case 0x6F: //o
+
+        case 0x66: //f key
+            wclear(w_exp);
+            wrefresh(w_exp);
             goto loadNewDir;
         case 0x20: //SpaceBar
             if (topOption == 0)
@@ -258,7 +262,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
-                
+
                 goto loadNewDir;
             }
             else if (topOption == 1)
@@ -266,7 +270,7 @@ resizeRefresh:
                 chdir(changeHome());
                 free(currdir);
                 free(display);
-                
+
                 goto loadNewDir;
             }
             else if (topOption == 2)
@@ -284,7 +288,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
-                
+
                 goto loadNewDir;
             }
         case 0x72:
@@ -312,12 +316,12 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
-                                    
+
                     goto loadNewDir;
                 }
                 free(currdir);
                 free(display);
-                                
+
                 goto loadNewDir; //Jump to start but load new files
             }
             else if (isFile(token))
@@ -340,13 +344,13 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
-                                    
+
                     goto loadNewDir;
                 }
             }
             free(currdir);
             free(display);
-                            
+
             goto loadNewDir; //Jump to start but load new files
 
         case 0x0A:                                      //Enter key (not numpad)
@@ -359,7 +363,7 @@ resizeRefresh:
                 wrefresh(w_exp);
                 free(currdir);
                 free(display);
-                                
+
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
@@ -385,11 +389,17 @@ resizeRefresh:
             wattron(w_help, COLOR_PAIR(1) | A_BOLD);
             mvwprintw(w_help, 9, 2, "Quick Commands:");
             wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 11, 2, "-Use the TAB to cycle through top menu");
+            mvwprintw(w_help, 11, 2, "-Use the TAB key to cycle through top menu");
             mvwprintw(w_help, 13, 2, "-Press SpaceBar to execute current top menu option");
             mvwprintw(w_help, 15, 2, "-Press 'r' to delete a File or Directory");
+
+            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 18, 2, "Other Keybinds:");
+            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 20, 2, "-Press 'f' to force explorer to refresh");
+
             wattron(w_help, A_BLINK);
-            mvwprintw(w_help, 20, 0, "Press 'q' to quit helpscreen");
+            mvwprintw(w_help, 23, 0, "Press 'q' to quit helpscreen");
             wattroff(w_help, A_BLINK);
             wrefresh(w_help);
             while (ch = wgetch(w_help))
@@ -401,7 +411,7 @@ resizeRefresh:
                     wrefresh(w_help);
                     free(currdir);
                     free(display);
-                                    
+
                     goto loadNewDir;
                 }
             }
