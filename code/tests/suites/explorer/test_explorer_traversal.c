@@ -81,3 +81,29 @@ TEST(test5) {
     //strTok removing Newlines
     assertFalse(isFile(files[2]));
 }
+
+//Testing exppwd from explorer.h
+//Test will compare exppwd PATH to string
+TEST(test6){
+    FILE *fp;
+    chdir(PATH);
+    //78 is the strlen of all characters exlcuding '\n','\0' etc
+    int isEqual = strncmp(exppwd(fp), PATH, 78);
+    assertEquals(isEqual, 0);
+}
+
+TEST(test7){
+    char newFileName[] = "touchExample.txt";
+    FILE *fp;
+    char **files;
+    
+    files = mallocStrArr(5, 20);
+    system("rm touchExample.txt");
+    chdir(PATH);
+    //reload directories contents into files
+    touch(newFileName);
+    expls(fp,files);
+    bool madeFile = isFile(files[3]);
+    system("rm touchExample.txt");
+    assertTrue(madeFile);
+}

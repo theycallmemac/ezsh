@@ -32,14 +32,6 @@ int expls(FILE *fp, char **currdir)
     return i;
 }
 
-/* chdir alias
-Input: char* directory
-*/
-void expcd(char *dir)
-{
-    chdir(dir);
-}
-
 char *exppwd(FILE *fp)
 {
     char pwd[100];
