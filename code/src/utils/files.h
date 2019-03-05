@@ -50,6 +50,8 @@ FILE *openFileWrite(char *path) {
     FILE *file = fopen(path, "w");
     return file;
 }
+
+
 // This function opens a file for appending
 // Takes the path to the file as a parameter and returns the FILE pointer from opening that file for appending
 FILE *openFileAppend(char *path) {

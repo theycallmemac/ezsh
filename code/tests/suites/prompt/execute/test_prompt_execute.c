@@ -8,14 +8,14 @@
 #include "../../../../src/utils/execute.h"
 
 TEST(test7) {
-    char *line[2]  = {"mkdir", "testDir"};
+    char *line[3]  = {"mkdir", "testDir"};
     int x = ezshExecute(line);
     assertTrue(x == 1);
     assertTrue(access("./testDir/", F_OK) == 0);
 }
 
 TEST(test8) { 
-    char *line[2]  = {"rmdir", "testDir"};
+    char *line[3]  = {"rmdir", "testDir"};
     int x = ezshExecute(line);
     assertTrue(x == 1);
     assertTrue(access("./testDir/", F_OK) != 0);

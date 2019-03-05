@@ -5,10 +5,9 @@
 #include <errno.h>
 
 #include "../../../cu/cu.h"
-#include "../../../../src/utils/commands/cd.h"
 
 TEST(test10) {
-    char *line[2]  = {"cd", ".."};
+    char *line[3]  = {"cd", ".."};
     int x = changeDir(line);
     assertTrue(x == 0);
 }
@@ -20,14 +19,8 @@ TEST(test11) {
 }
 
 TEST(test12) {
-    const char *line[2]  = {"cd", "blah/blah"};
+    char *line[3]  = {"cd", "blah/blah"};
     int x = errorChangeDir(line);
     assertTrue(x == 1);
 }
 
-TEST(test13) {
-    const char *PATH = changeHome();
-    int x = system("cd $HOME");
-    int y = changeDir(PATH);
-    assertTrue(x == y);
-}
