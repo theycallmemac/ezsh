@@ -9,7 +9,7 @@
 #include "../strings.h"
 
 
-//  This function shows the entire history of the user (what they have entered at the prompt)
+// This function shows the entire history of the user (what they have entered at the prompt)
 // Returns void and parameters are void
 void showHistory(void) {
     char *name = "history";

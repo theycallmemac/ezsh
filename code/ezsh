@@ -51,7 +51,7 @@ tmux kill-window -t $session:$( tmux list-windows -t $session -F "#{window_index
 
 tmux select-window -t $session:$active_window
 
-tmux select-pane -t $session:$active_window.$active_pane
+tmux select-pane -t 1
 
 tmux $TMUX_OPTS attach-session -t $session
 
