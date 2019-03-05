@@ -16,7 +16,14 @@ INFO_OBJ = $(INFO_SRC:.c=.o)
 
 INFO = info
 
-all:	$(PROMPT) $(EXP) $(INFO)
+MSG_SRC = src/messages.c
+
+MSG_OBJ = $(MSG_SRC:.c=.o)
+
+MSG = msg
+
+
+all:	$(PROMPT) $(EXP) $(INFO) $(MSG)
 
 $(PROMPT): $(PROMPT_OBJ)
 		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
@@ -27,8 +34,12 @@ $(EXP): $(EXP_OBJ)
 $(INFO): $(INFO_OBJ)
 		gcc -o $(INFO) $(INFO_OBJ) -lncurses
 
+$(MSG): $(MSG_OBJ)
+		gcc -o $(MSG) $(MSG_OBJ)
+
+
 clean:
-		rm $(PROMPT) $(EXP) $(PROMPT_OBJ) $(EXP_OBJ) $(INFO) $(INFO_OBJ)
+		rm $(PROMPT) $(EXP) $(PROMPT_OBJ) $(EXP_OBJ) $(INFO) $(INFO_OBJ) $(MSG) $(MSG_OBJ)
 
 .PHONY: all clean
 
