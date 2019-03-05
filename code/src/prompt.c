@@ -7,14 +7,30 @@
 #include <readline/history.h>
 
 #include <pthread.h>
+#include <fcntl.h>
 
 #include "utils/colour.h"
 #include "utils/tokenize.h"
 #include "utils/execute.h"
 #include "utils/operations.h"
 #include "utils/systemFiles.h"
-#include "utils/panesync.h"
+// #include "utils/panesync.h"
 
+#define EXP2PROMPT "/tmp/exp2prompt"
+#define PROMPT2EXP "/tmp/prompt2exp"
+
+void pipeReadexp(){
+    int fd;
+    char str[100];
+    while(1){
+        /* code */
+        fd = open(EXP2PROMPT, O_RDONLY);
+        read(fd,str,100);
+        chdir(str);
+        close(fd);
+    }
+    
+}
 
 // This function sets up the default prompt of ezsh
 // Takes three char arrays: uname (the name of the current user), cwd (the name of the currently working directory), and hostname (the name of the machine they are working on)
@@ -45,8 +61,10 @@ void ezshLoop(void) {
     int status;
     pthread_t msglstnr;
     int msg;
-        msg = pthread_create(&msg, NULL, pipeRead, NULL);
+        msg = pthread_create(&msglstnr, NULL, pipeReadexp, NULL);
+    char *dirMsg;
     do {
+        dirMsg = (char *)malloc(300);
         char cwd[1024];
         char hostname[1024];
         gethostname(hostname, 1024);
@@ -59,6 +77,17 @@ void ezshLoop(void) {
         }
         args = ezshSplitLine(line);
         status = ezshExecute(args);
+        strcat(dirMsg, "YELL='\033[1;33m' && WHITE='\033[0m'&& echo ${YELL}'Command -->' ${WHITE}");
+        for (int i = 0; i < 200; i++) {
+            if (args[i] == NULL) {
+                break;
+            }
+            strcat(dirMsg, args[i]);
+            strcat(dirMsg, " ");
+        }
+        strcat(dirMsg, "> $(tail -1 ~/.ezsh/.ezsh.tty)\n");
+        system(dirMsg);
+        free(dirMsg);
         free(line);
         free(args);
     } while (status); 
@@ -82,17 +111,13 @@ void handler(int signal) {
 // Returns type int, EXIT_SUCCESS 
 int main(int argc, char **argv) {
     int keepRunning = 1;
-    char * pipePath = "/tmp/.ezshMsgPasser";
 
-    pthread_t inputlstnr;
-    int input;
+    mkfifo(PROMPT2EXP, 0666);
 
-    mkfifo(pipePath, 0666);
     signal(SIGINT, handler);
     rl_bind_key('\t', rl_complete);
     checkFiles();
     while (keepRunning) {
-        // input = pthread_create(&input,NULL,ezshLoop, NULL);
         ezshLoop();
     }
     return EXIT_SUCCESS;

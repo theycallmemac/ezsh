@@ -2,10 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
+#include <fcntl.h>
 
 #include "./utils/explorer.h"
 #include "./utils/commands/cd.h"
 #include "./utils/panesync.h"
+
+#define EXP2PROMPT "/tmp/exp2prompt"
+#define PROMPT2EXP "/tmp/prompt2exp"
+
+void pipeReadprompt(void){
+    int pipeFile;
+    char pwd[100];
+    while(1){
+        pipeFile = open(PROMPT2EXP, O_RDONLY);
+        read(pipeFile, pwd, 100);     
+        // mkdir("SomeTestShit", 0777);
+        chdir("..");
+        close(pipeFile);
+        }
+}
 
 void main()
 {
@@ -39,10 +56,15 @@ void main()
     
     int p;
     int pipeFile;
-    char * pipePath = "/tmp/ezshMsgPasser";
-    mkfifo(pipePath, 0666);
+    // char * pipePath = "/tmp/ezshMsgPasser";
+    mkfifo(EXP2PROMPT, 0666);
 
+    int msg;
+    pthread_t msglstnr;
+    msg = pthread_create(&msglstnr, NULL, pipeReadprompt, NULL);
+    
 loadNewDir:
+
     initscr();
 
     /*Allocate memory for currdir*/
@@ -72,7 +94,7 @@ loadNewDir:
     system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
-    pipeWrite(pwd);
+    pipeWrite(pwd, EXP2PROMPT);
 
     /*Revised ls that returns ttl file count*/
     //Track options section in currdir array (All files)
@@ -166,6 +188,7 @@ resizeRefresh:
 
     do
     {
+    
         sprintf(macroOption, "%s", shortcut[topOption]);
         mvwprintw(w_macros, 0, topOption * 6, "%s", macroOption);
 
@@ -212,6 +235,9 @@ resizeRefresh:
             commandFlag = 1;
             topOption = (topOption > 2) ? 0 : topOption;
             break;
+        
+        case 0x6F: //o
+            goto loadNewDir;
         case 0x20: //SpaceBar
             if (topOption == 0)
             {
@@ -232,6 +258,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
+                
                 goto loadNewDir;
             }
             else if (topOption == 1)
@@ -239,6 +266,7 @@ resizeRefresh:
                 chdir(changeHome());
                 free(currdir);
                 free(display);
+                
                 goto loadNewDir;
             }
             else if (topOption == 2)
@@ -256,6 +284,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
+                
                 goto loadNewDir;
             }
         case 0x72:
@@ -283,10 +312,12 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
+                                    
                     goto loadNewDir;
                 }
                 free(currdir);
                 free(display);
+                                
                 goto loadNewDir; //Jump to start but load new files
             }
             else if (isFile(token))
@@ -309,11 +340,13 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
+                                    
                     goto loadNewDir;
                 }
             }
             free(currdir);
             free(display);
+                            
             goto loadNewDir; //Jump to start but load new files
 
         case 0x0A:                                      //Enter key (not numpad)
@@ -326,6 +359,7 @@ resizeRefresh:
                 wrefresh(w_exp);
                 free(currdir);
                 free(display);
+                                
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
@@ -367,6 +401,7 @@ resizeRefresh:
                     wrefresh(w_help);
                     free(currdir);
                     free(display);
+                                    
                     goto loadNewDir;
                 }
             }

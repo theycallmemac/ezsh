@@ -31,6 +31,7 @@ int expls(FILE *fp, char *command, char **currdir)
     pclose(fp);
     return i;
 }
+
 /* chdir alias
 Input: char* directory
 */
@@ -86,6 +87,8 @@ _Bool isDir(const char *name)
     }
 }
 
+/*
+*/
 void touch(const char *fileName)
 {
     char newFile[100] = {"touch "};
@@ -93,6 +96,8 @@ void touch(const char *fileName)
     system(newFile);
 }
 
+/*
+*/
 char** mallocStrArr(int arrSize, int strSize){
     char** arr;
     arr = malloc(arrSize * sizeof(char*));

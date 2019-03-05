@@ -3,11 +3,24 @@
 #include <pwd.h>
 
 // This function is invoked to check if changing to that directory is possible or not
-int errorChangeDir(const char *dir) {
+// If it is, the action is executed
+int errorChangeDir(char *dir) {
+        char str[200];
+        char cwd[120];
+        getcwd(cwd, sizeof(cwd));
+        strcat(str, cwd);
+        strcat(str, "/");
+        strcat(str, dir);
+        int pipeFile;
+        pipeFile = open("/tmp/prompt2exp", O_WRONLY);
+        write(pipeFile, strtok(str,"\n"), strlen(str)+1);
+        close(pipeFile);
+        printf("%s\n", str);
+        printf("%d\n",strcmp(str, "/home/nohclu"));
     if (chdir(dir) != 0) {
         perror("ezsh");
         return 1;
-    }
+    }   
 }
 
 // This function gets the users home directory when cd is passed no arguments
