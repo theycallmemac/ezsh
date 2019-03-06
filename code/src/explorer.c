@@ -19,7 +19,6 @@ void pipeReadprompt(void)
     {
         pipeFile = open(PROMPT2EXP, O_RDONLY);
         read(pipeFile, pwd, 100);
-        // mkdir("SomeTestShit", 0777);
         chdir(pwd);
         close(pipeFile);
     }
@@ -27,14 +26,8 @@ void pipeReadprompt(void)
 
 void main()
 {
-
-    const int MAXSIZE = 17;
     const int OPTIONS = 15;
     const int PADDINGTOP = 1;
-    const int MARGINTOP = 3;
-
-    const int FILEINDEX = 30;
-    const int PWDY = 20;
 
     FILE *fptr;
     char **currdir;
@@ -55,9 +48,9 @@ void main()
     WINDOW *w_form;
     WINDOW *w_help;
 
-    int p;
+    int count;
     int pipeFile;
-    // char * pipePath = "/tmp/ezshMsgPasser";
+    
     mkfifo(EXP2PROMPT, 0666);
 
     int msg;
@@ -69,10 +62,10 @@ loadNewDir:
     initscr();
 
     /*Allocate memory for currdir*/
-    currdir = mallocStrArr(100, 100);
+    currdir = mallocStrArr(300, 100);
 
-    p = expls(fptr, currdir) - 1;
-    w_exp = newwin(p + 2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
+    count = expls(fptr, currdir) - 1;
+    w_exp = newwin(count + 2, 100, 3, 1); //Interactive file explorer(Center; left)
     w_command = newwin(2, 30, 0, 21);         //Command required to execute(Top; right)
     w_info = newwin(8, 50, 20, 2);            //Info on FE(Bottom; left)
     w_macros = newwin(3, 20, 0, 3);           //QuickCommands(Top; left)
@@ -165,7 +158,7 @@ resizeRefresh:
     /*Current position in directory*/
     wattron(w_command, COLOR_PAIR(3) | A_BOLD);
     wattron(w_macros, A_BOLD | A_UNDERLINE);
-    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, count);
     mvwprintw(w_info, 1, 0, "%s", pwd);
     mvwprintw(w_info, 2, 0, "Press 'h' for help");
     mvwprintw(w_command, 0, 0, "Command:");
@@ -220,10 +213,10 @@ resizeRefresh:
             optionIndex++;
             currPoint++;
             commandFlag = 0;
-            if ((optionIndex > (p % OPTIONS)) && (currPoint > p))
+            if ((optionIndex > (count % OPTIONS)) && (currPoint > count))
             {
-                optionIndex = (p % OPTIONS);
-                currPoint = p;
+                optionIndex = (count % OPTIONS);
+                currPoint = count;
             }
             if (optionIndex == OPTIONS)
             {
@@ -467,7 +460,7 @@ resizeRefresh:
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
         wclear(w_info);
-        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, count);
         mvwprintw(w_info, 1, 0, "%s", pwd);
         wattron(w_info, A_BLINK | A_BOLD | COLOR_PAIR(3));
         mvwprintw(w_info, 2, 0, "Press 'h' for help");

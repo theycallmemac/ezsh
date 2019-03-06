@@ -18,19 +18,6 @@
 #define EXP2PROMPT "/tmp/exp2prompt"
 #define PROMPT2EXP "/tmp/prompt2exp"
 
-void pipeReadexp()
-{
-    int fd;
-    char str[100];
-    while (1)
-    {
-        /* code */
-        fd = open(EXP2PROMPT, O_RDONLY);
-        read(fd, str, 100);
-        chdir(str);
-        close(fd);
-    }
-}
 
 // This function sets up the default prompt of ezsh
 // Takes three char arrays: uname (the name of the current user), cwd (the name of the currently working directory), and hostname (the name of the machine they are working on)
@@ -53,6 +40,33 @@ char *ezshPrompt(char uname[], char cwd[], char hostname[])
     return "";
 }
 
+void pipeReadexp()
+{
+    int fd;
+    char str[100];
+    int f = 0;
+    while (1)
+    {
+        fd = open(EXP2PROMPT, O_RDONLY);
+        read(fd, str, 100);
+        if(chdir(str)==0){
+            if(f){
+                char cwd[1024];
+                char hostname[1024];
+                gethostname(hostname, 1024);
+                getcwd(cwd, sizeof(cwd));
+                char *uname = getlogin();
+                printf("\n");
+                ezshPrompt(uname, cwd, hostname);
+            } else
+            {
+                f = 1;
+            }
+            
+        }
+        close(fd);
+    }
+}
 // This function runs a loop consisting of: read, tokenize, and execute
 // This function takes no parameters
 // This function is of type void, so it returns nothing
@@ -65,8 +79,7 @@ void ezshLoop(void)
     int msg;
     msg = pthread_create(&msglstnr, NULL, pipeReadexp, NULL);
     char *dirMsg;
-    do
-    {
+    do {
         dirMsg = (char *)malloc(300);
         char cwd[1024];
         char hostname[1024];
@@ -96,7 +109,8 @@ void ezshLoop(void)
         free(dirMsg);
         free(line);
         free(args);
-    } while (status);
+    } while(status);
+    
 }
 
 // This function catches signals such as the `ctrl-C` signal, and then free's the line state and runs the prompt code again
