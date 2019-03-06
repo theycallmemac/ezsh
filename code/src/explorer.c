@@ -2,20 +2,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
+#include <fcntl.h>
 
 #include "./utils/explorer.h"
 #include "./utils/commands/cd.h"
 
+#define EXP2PROMPT "/tmp/exp2prompt"
+#define PROMPT2EXP "/tmp/prompt2exp"
+
+void pipeReadprompt(void)
+{
+    int pipeFile;
+    char pwd[100];
+    while (1)
+    {
+        pipeFile = open(PROMPT2EXP, O_RDONLY);
+        read(pipeFile, pwd, 100);
+        chdir(pwd);
+        close(pipeFile);
+    }
+}
+
 void main()
 {
-
-    const int MAXSIZE = 17;
     const int OPTIONS = 15;
     const int PADDINGTOP = 1;
-    const int MARGINTOP = 3;
-
-    const int FILEINDEX = 30;
-    const int PWDY = 20;
 
     FILE *fptr;
     char **currdir;
@@ -35,16 +47,25 @@ void main()
     WINDOW *w_macros;
     WINDOW *w_form;
     WINDOW *w_help;
-    int p;
+
+    int count;
+    int pipeFile;
+    
+    mkfifo(EXP2PROMPT, 0666);
+
+    int msg;
+    pthread_t msglstnr;
+    msg = pthread_create(&msglstnr, NULL, pipeReadprompt, NULL);
 
 loadNewDir:
+
     initscr();
 
     /*Allocate memory for currdir*/
-    currdir = mallocStrArr(100, 100);
+    currdir = mallocStrArr(300, 100);
 
-    p = expls(fptr, "/bin/ls", currdir) - 1;
-    w_exp = newwin(p + 2, 100, MARGINTOP, 1); //Interactive file explorer(Center; left)
+    count = expls(fptr, currdir) - 1;
+    w_exp = newwin(count + 2, 100, 3, 1); //Interactive file explorer(Center; left)
     w_command = newwin(2, 30, 0, 21);         //Command required to execute(Top; right)
     w_info = newwin(8, 50, 20, 2);            //Info on FE(Bottom; left)
     w_macros = newwin(3, 20, 0, 3);           //QuickCommands(Top; left)
@@ -67,6 +88,9 @@ loadNewDir:
     system(dirMsg);
 
     strcpy(pwd, exppwd(fptr));
+    pipeFile = open(EXP2PROMPT, O_WRONLY);
+    write(pipeFile, strtok(pwd, "\n"), strlen(pwd) + 1);
+    close(pipeFile);
 
     /*Revised ls that returns ttl file count*/
     //Track options section in currdir array (All files)
@@ -118,12 +142,12 @@ resizeRefresh:
         {
             wattron(w_exp, COLOR_PAIR(1));
         }
-        else if (isFile(strtok(display[n], "\n")))
+        else if (isFile(display[n]))
         {
             wattron(w_exp, COLOR_PAIR(2));
             wattroff(w_exp, A_BOLD);
         }
-        else if (isDir(strtok(display[n], "\n")))
+        else if (isDir(display[n]))
         {
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }
@@ -134,7 +158,7 @@ resizeRefresh:
     /*Current position in directory*/
     wattron(w_command, COLOR_PAIR(3) | A_BOLD);
     wattron(w_macros, A_BOLD | A_UNDERLINE);
-    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+    mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, count);
     mvwprintw(w_info, 1, 0, "%s", pwd);
     mvwprintw(w_info, 2, 0, "Press 'h' for help");
     mvwprintw(w_command, 0, 0, "Command:");
@@ -159,6 +183,7 @@ resizeRefresh:
 
     do
     {
+
         sprintf(macroOption, "%s", shortcut[topOption]);
         mvwprintw(w_macros, 0, topOption * 6, "%s", macroOption);
 
@@ -188,10 +213,10 @@ resizeRefresh:
             optionIndex++;
             currPoint++;
             commandFlag = 0;
-            if ((optionIndex > (p % OPTIONS)) && (currPoint > p))
+            if ((optionIndex > (count % OPTIONS)) && (currPoint > count))
             {
-                optionIndex = (p % OPTIONS);
-                currPoint = p;
+                optionIndex = (count % OPTIONS);
+                currPoint = count;
             }
             if (optionIndex == OPTIONS)
             {
@@ -205,6 +230,11 @@ resizeRefresh:
             commandFlag = 1;
             topOption = (topOption > 2) ? 0 : topOption;
             break;
+
+        case 0x66: //f key
+            wclear(w_exp);
+            wrefresh(w_exp);
+            goto loadNewDir;
         case 0x20: //SpaceBar
             if (topOption == 0)
             {
@@ -225,6 +255,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
+
                 goto loadNewDir;
             }
             else if (topOption == 1)
@@ -232,6 +263,7 @@ resizeRefresh:
                 chdir(changeHome());
                 free(currdir);
                 free(display);
+
                 goto loadNewDir;
             }
             else if (topOption == 2)
@@ -249,6 +281,7 @@ resizeRefresh:
                 wrefresh(w_form);
                 free(currdir);
                 free(display);
+
                 goto loadNewDir;
             }
         case 0x72:
@@ -256,7 +289,7 @@ resizeRefresh:
             char remF[100];
             char answer[10];
 
-            if (isDir(token))
+            if (isDir(display[optionIndex]))
             {
                 wclear(w_command);
                 mvwprintw(w_command, 0, 0, "Command: rm -rf %s", display[optionIndex]);
@@ -276,13 +309,15 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
+
                     goto loadNewDir;
                 }
                 free(currdir);
                 free(display);
+
                 goto loadNewDir; //Jump to start but load new files
             }
-            else if (isFile(token))
+            else if (isFile(display[optionIndex]))
             {
                 wclear(w_command);
                 mvwprintw(w_command, 0, 0, "Command: rm %s", display[optionIndex]);
@@ -302,16 +337,18 @@ resizeRefresh:
                 {
                     free(currdir);
                     free(display);
+
                     goto loadNewDir;
                 }
             }
             free(currdir);
             free(display);
+
             goto loadNewDir; //Jump to start but load new files
 
         case 0x0A:                                      //Enter key (not numpad)
             token = strtok(display[optionIndex], "\n"); //parsing for expls (removes newline)
-            if (isDir(token) || strcmp(token, "..") == 0)
+            if (isDir(display[optionIndex]) || strcmp(token, "..") == 0)
             {
                 chdir(display[optionIndex]);
                 //Reset win completely
@@ -319,10 +356,11 @@ resizeRefresh:
                 wrefresh(w_exp);
                 free(currdir);
                 free(display);
+
                 goto loadNewDir; //Jump to start but load new files
             }
             /*Open gedit in specified file*/
-            else if (isFile(token) && !fork())
+            else if (isFile(display[optionIndex]) && !fork())
             {
                 execlp("gedit", "gedit", token, NULL);
                 break;
@@ -344,11 +382,17 @@ resizeRefresh:
             wattron(w_help, COLOR_PAIR(1) | A_BOLD);
             mvwprintw(w_help, 9, 2, "Quick Commands:");
             wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 11, 2, "-Use the TAB to cycle through top menu");
+            mvwprintw(w_help, 11, 2, "-Use the TAB key to cycle through top menu");
             mvwprintw(w_help, 13, 2, "-Press SpaceBar to execute current top menu option");
             mvwprintw(w_help, 15, 2, "-Press 'r' to delete a File or Directory");
+
+            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 18, 2, "Other Keybinds:");
+            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(w_help, 20, 2, "-Press 'f' to force explorer to refresh");
+
             wattron(w_help, A_BLINK);
-            mvwprintw(w_help, 20, 0, "Press 'q' to quit helpscreen");
+            mvwprintw(w_help, 23, 0, "Press 'q' to quit helpscreen");
             wattroff(w_help, A_BLINK);
             wrefresh(w_help);
             while (ch = wgetch(w_help))
@@ -360,6 +404,7 @@ resizeRefresh:
                     wrefresh(w_help);
                     free(currdir);
                     free(display);
+
                     goto loadNewDir;
                 }
             }
@@ -376,13 +421,13 @@ resizeRefresh:
         //What command to display in top right based of flag
         if (commandFlag == 0)
         {
-            if (isFile(strtok(display[optionIndex], "\n")))
+            if (isFile(display[optionIndex]))
             {
                 mvwprintw(w_command, 0, 0, "Command: gedit %s", display[optionIndex]);
                 wrefresh(w_command);
                 wclear(w_command);
             }
-            else if (isDir(strtok(display[optionIndex], "\n")))
+            else if (isDir(display[optionIndex]))
             {
                 mvwprintw(w_command, 0, 0, "Command: cd %s", display[optionIndex]);
                 wrefresh(w_command);
@@ -415,7 +460,7 @@ resizeRefresh:
         wattron(w_exp, COLOR_PAIR(2));
         wattroff(w_exp, A_BOLD);
         wclear(w_info);
-        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, p);
+        mvwprintw(w_info, 0, 0, "File: %d/%d", currPoint, count);
         mvwprintw(w_info, 1, 0, "%s", pwd);
         wattron(w_info, A_BLINK | A_BOLD | COLOR_PAIR(3));
         mvwprintw(w_info, 2, 0, "Press 'h' for help");
@@ -424,12 +469,12 @@ resizeRefresh:
         wattron(w_exp, A_STANDOUT);
         wrefresh(w_info);
 
-        if (isFile(strtok(display[optionIndex], "\n")))
+        if (isFile(display[optionIndex]))
         {
             wattron(w_exp, COLOR_PAIR(2));
             wattroff(w_exp, A_BOLD);
         }
-        else if (isDir(strtok(display[optionIndex], "\n")))
+        else if (isDir(display[optionIndex]))
         {
             wattron(w_exp, COLOR_PAIR(1) | A_BOLD);
         }

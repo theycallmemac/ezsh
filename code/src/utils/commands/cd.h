@@ -4,12 +4,15 @@
 
 // This function is invoked to check if changing to that directory is possible or not
 // If it is, the action is executed
-int errorChangeDir(const char *dir) {
+int errorChangeDir(char *dir) {
+        int pipeFile;
+        pipeFile = open("/tmp/prompt2exp", O_WRONLY);
+        write(pipeFile, strtok(dir,"\n"), strlen(dir)+1);
+        close(pipeFile);
     if (chdir(dir) != 0) {
         perror("ezsh");
         return 1;
-    }
-    
+    }   
 }
 
 // This function gets the users home directory when cd is passed no arguments

@@ -26,10 +26,10 @@ MSG = msg
 all:	$(PROMPT) $(EXP) $(INFO) $(MSG)
 
 $(PROMPT): $(PROMPT_OBJ)
-		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline 
+		gcc -o $(PROMPT) $(PROMPT_OBJ) -lreadline -pthread
 
 $(EXP): $(EXP_OBJ)
-		gcc -o $(EXP) $(EXP_OBJ) -lncurses
+		gcc -o $(EXP) $(EXP_OBJ) -lncurses -pthread
 
 $(INFO): $(INFO_OBJ)
 		gcc -o $(INFO) $(INFO_OBJ) -lncurses
