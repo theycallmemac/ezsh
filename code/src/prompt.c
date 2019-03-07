@@ -50,7 +50,7 @@ void pipeReadexp()
         fd = open(EXP2PROMPT, O_RDONLY);
         read(fd, str, 100);
         if(chdir(str)==0){
-            if(f){
+            if(f == 0){
                 char cwd[1024];
                 char hostname[1024];
                 gethostname(hostname, 1024);
