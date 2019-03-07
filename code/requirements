@@ -1,3 +1,1 @@
-#!/bin/bash/
-
-sudo apt-get install tmux libreadline-dev ibncurses5-dev libncursesw5-dev toilet 
+sudo apt-get install tmux libreadline-dev libncurses5-dev libncursesw5-dev toilet 
