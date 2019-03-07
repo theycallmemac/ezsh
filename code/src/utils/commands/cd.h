@@ -1,18 +1,24 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <fcntl.h>
 
-// This function is invoked to check if changing to that directory is possible or not
-// If it is, the action is executed
-int errorChangeDir(char *dir) {
+
+void sendMessage(char *dir) {
         int pipeFile;
         pipeFile = open("/tmp/prompt2exp", O_WRONLY);
         write(pipeFile, strtok(dir,"\n"), strlen(dir)+1);
         close(pipeFile);
+}
+
+// This function is invoked to check if changing to that directory is possible or not
+// If it is, the action is executed
+int tryChangeDir(char *dir) {
     if (chdir(dir) != 0) {
         perror("ezsh");
         return 1;
-    }   
+    }
+    return 0; 
 }
 
 // This function gets the users home directory when cd is passed no arguments
@@ -29,9 +35,10 @@ const char *changeHome(void) {
 int changeDir(char **args) {
     if (args[1] == NULL) {
         const char *HOME = changeHome();
-        errorChangeDir(HOME);
+        tryChangeDir(HOME);
+        sendMessage(HOME);
     } else {
-        errorChangeDir(args[1]);
+        tryChangeDir(args[1]);
     }
     return 0;
 }
