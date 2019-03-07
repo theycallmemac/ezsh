@@ -118,14 +118,19 @@ void ezshLoop(void)
 // Returns the void type, meaning it returns nothing
 void handler(int signal)
 {
-    rl_free_line_state();
-    printf("\n");
     char cwd[1024];
     char hostname[1024];
     gethostname(hostname, 1024);
     getcwd(cwd, sizeof(cwd));
     char *uname = getlogin();
-    ezshPrompt(uname, cwd, hostname);
+    char *currentLine;
+    currentLine = rl_copy_text(0, rl_end);
+    rl_replace_line("", 0);
+    rl_redisplay();
+    printf("\n");
+    rl_set_prompt(ezshPrompt(uname, cwd, hostname));
+    rl_redisplay();
+    free(currentLine);
 }
 
 // This main function watches for signals passed, binds the tab key for autocomplete, creates .ezsh files and runs the loop
