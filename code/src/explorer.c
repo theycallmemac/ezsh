@@ -11,6 +11,8 @@
 #define EXP2PROMPT "/tmp/exp2prompt"
 #define PROMPT2EXP "/tmp/prompt2exp"
 
+int REFREQ = 1;
+
 void pipeReadprompt(void)
 {
     int pipeFile;
@@ -19,7 +21,9 @@ void pipeReadprompt(void)
     {
         pipeFile = open(PROMPT2EXP, O_RDONLY);
         read(pipeFile, pwd, 100);
-        chdir(pwd);
+        if(chdir(pwd) == 0){
+            REFREQ = 0;
+        }
         close(pipeFile);
     }
 }
@@ -66,11 +70,11 @@ loadNewDir:
 
     count = expls(fptr, currdir) - 1;
     w_exp = newwin(count + 2, 100, 3, 1); //Interactive file explorer(Center; left)
-    w_command = newwin(2, 30, 0, 21);         //Command required to execute(Top; right)
-    w_info = newwin(8, 50, 20, 2);            //Info on FE(Bottom; left)
-    w_macros = newwin(3, 20, 0, 3);           //QuickCommands(Top; left)
-    w_form = newwin(1, 60, 20, 2);
-    w_help = newwin(50, 100, 0, 2);
+    w_command = newwin(2, 30, 0, 21);//Command required to execute(Top; right)
+    w_info = newwin(8, 50, 20, 2);//Info on FE(Bottom; left)
+    w_macros = newwin(3, 20, 0, 3);//QuickCommands(Top; left)
+    w_form = newwin(1, 60, 20, 2);//Form for file/dir creation
+    w_help = newwin(50, 100, 0, 2);//Help Screen
 
     noecho();
     curs_set(FALSE);
@@ -183,7 +187,7 @@ resizeRefresh:
 
     do
     {
-
+        
         sprintf(macroOption, "%s", shortcut[topOption]);
         mvwprintw(w_macros, 0, topOption * 6, "%s", macroOption);
 
@@ -191,6 +195,13 @@ resizeRefresh:
         mvwprintw(w_exp, optionIndex + PADDINGTOP, 2, "%s", option);
 
         refresh();
+        
+        if (REFREQ == 0) {
+            REFREQ = 1;
+            wclear(w_exp);
+            wrefresh(w_exp);
+            goto loadNewDir;
+        }
         switch (ch)
         {
         case KEY_UP:
