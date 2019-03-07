@@ -20,7 +20,7 @@ testExp: $(EXP_OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f testPrompt testExp *.o test suites/*.o suites/*/*.o regressions/*
+	rm -f testPrompt testExp *.o test suites/*.o suites/*/*/*.o regressions/*
 
 .PHONY: all clean
 
