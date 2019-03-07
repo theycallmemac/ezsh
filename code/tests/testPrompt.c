@@ -5,6 +5,7 @@
 #include "suites/prompt/cd/test_prompt_cd.h"
 #include "suites/prompt/help/test_prompt_help.h"
 #include "suites/prompt/files/test_prompt_files.h"
+#include "suites/prompt/strings/test_prompt_strings.h"
 
 
 // This struct contains all test suites
@@ -16,6 +17,7 @@ TEST_SUITES {
     TEST_SUITE_ADD(T4), // add T4 test suite
     TEST_SUITE_ADD(T5), // add T5 test suite
     TEST_SUITE_ADD(T6), // add T6 test suite
+    TEST_SUITE_ADD(T7), // add T7 test suite
     TEST_SUITES_CLOSURE
 };
 
