@@ -89,7 +89,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
 
 - ##### Navigation
 
-    ![](https://im2.ezgif.com/tmp/ezgif-2-aa9daedca9c4.gif)
+    ![](https://ezsh.xyz/images/updown.gif)
 
     Use the `Up` and `Down` to navigate the current directory. Pressing `Enter` either opens the file in the users text editor, or opens that directory in the Explorer. 
     
@@ -97,7 +97,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
 
 - ##### Command Menu
 
-    ![](https://im2.ezgif.com/tmp/ezgif-2-03d8166656fc.gif)
+    ![](https://ezsh.xyz/images/menu.gif)
     
    A sequence of commands which can be used to execute different operations is to be found at the top of the Explorer pane. These commands are:
 
@@ -114,7 +114,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
 
 - ##### Command Shortcuts
 
-    ![](https://im2.ezgif.com/tmp/ezgif-2-b23d0ab3528e.gif)    
+    ![](https://ezsh.xyz/images/hotkeys.gif)    
     
 
     There exists a set of operations to be performed in the Explorer thorugh the use of key presses.
@@ -135,7 +135,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
     
 - ##### Navigation
 
-    ![](https://im2.ezgif.com/tmp/ezgif-2-a67248f21478.gif)
+    ![](https://ezsh.xyz/images/prompt.gif)
     
     Navigation in the prompt is completed through the use of the built-in `cd` command. This command allows the user to change directory, where the name of the desired directory follows the command in such formats as below:
     - `cd nameOfDirectory` to enter a specified directory.
@@ -149,7 +149,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
 - ##### Built-in Commands
     - history
     
-        ![](https://im2.ezgif.com/tmp/ezgif-2-08fe09111b28.gif)
+        ![](https://ezsh.xyz/images/history.gif)
     
          The `history` command allows users to view the entire history of what they have entered at the Prompt.
      
@@ -169,7 +169,7 @@ Along with this, the size of each of these panes is adjustable, just simply clic
 
     - star
         
-        ![](https://im2.ezgif.com/tmp/ezgif-2-6ec6534311d9.gif)
+        ![](https://ezsh.xyz/images/stars.gif)
         
          The `star` command allows users to jump around their filesystem with ezsh's psuedo-bookmark system.
      
