@@ -3,21 +3,26 @@
 ### 0. Content
 0. Content
 1. Introduction
-- 1.1 Project Overview
-- 1.2 Glossary
-
+    - 1.1 Project Overview
+    - 1.2 Glossary
 2. System Architecture
-- 2.1 Dependencies
-- 2.2 Language of Choice
-4. High-Level Design
-- 3.1 Language Choice
-- 3.2 Overall Design
-5. Issues
-6. Installation Guide
-- 5.1 Installing Compilers and Build Tools
-- 5.2 Installing Shell Utilities
-7. Configuration
-8. Testing
+    - 2.1 Dependencies
+    - 2.2 Language of Choice
+3. High-Level Design
+    - 4.1 Initial Design
+    - 4.2 Current Design
+4. Issues
+5. Installation Guide
+    - 5.1 Installing Compilers and Build Tools
+    - 5.2 Installing Shell Utilities
+    - 5.3 Run ezsh
+6. Configuration
+    - 6.1 Configuration File Location
+    - 6.2 Default ezsh Configuration
+    - 6.3 Sample ezsh Configurations
+7. Testing
+    - 7.1 Functional
+    - 7.2 Non-Functional
 
 ### 1. Introduction
 
