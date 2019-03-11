@@ -57,9 +57,8 @@ void main()
     
     mkfifo(EXP2PROMPT, 0666);
 
-    int msg;
     pthread_t msglstnr;
-    msg = pthread_create(&msglstnr, NULL, pipeReadprompt, NULL);
+    pthread_create(&msglstnr, NULL, pipeReadprompt, NULL);
 
 loadNewDir:
 

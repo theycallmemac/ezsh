@@ -14,6 +14,7 @@ void sendMessage(char *dir) {
 // This function is invoked to check if changing to that directory is possible or not
 // If it is, the action is executed
 int tryChangeDir(char *dir) {
+    sendMessage(dir);
     if (chdir(dir) != 0) {
         perror("ezsh");
         return 1;
