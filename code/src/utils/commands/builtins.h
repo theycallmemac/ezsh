@@ -9,7 +9,6 @@
 #include "help.h"
 #include "history.h"
 #include "star.h"
-#include "info.h"
 
 
 // Define functions to be loaded into builtinFunc
