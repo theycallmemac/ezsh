@@ -14,7 +14,7 @@ TEST(test10) {
 }
 
 TEST(test11) { 
-    int x = tryChangeDir(".");
+    int x = tryChangeDir("../..");
     assertTrue(x == 0);
 }
 
