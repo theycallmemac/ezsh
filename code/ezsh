@@ -1,6 +1,6 @@
 #!/bin/bash
 
-make
+make 2> /dev/null
 cp .tmux.conf $HOME
 
 for f in {$PWD,$HOME}/.ezsh/.ezsh.conf; do
