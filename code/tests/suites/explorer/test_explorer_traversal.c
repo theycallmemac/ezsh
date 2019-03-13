@@ -6,15 +6,16 @@
 #include "../../cu/cu.h"
 #include "../../../src/utils/explorer.h"
 
-static const char PATH[] = "/home/nohclu/2019-ca326-mcdermj7-ezsh/code/tests/suites/explorer/staticTestDir";
-
 //Testing expls from explorer.h
 //Test ensures that expls is able to count the correct number of files in a directory
 TEST(test1) {
 
     FILE *fp;
     char **dirFiles;
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
 
     dirFiles = mallocStrArr(3,20);
     int lscount = expls(fp, dirFiles);
@@ -29,7 +30,10 @@ TEST(test2) {
     FILE *fp;
     char **files;
     files = mallocStrArr(3,20);
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
 
     expls(fp, files);
     /*Index of files is: [0] = "..", [1] = "file.txt", [2] = "testDir"*/
@@ -44,7 +48,10 @@ TEST(test3) {
     FILE *fp;
     char **files;
     files = mallocStrArr(3,20);
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
 
     expls(fp, files);
     /*Index of files is: [0] = "..", [1] = "file.txt", [2] = "testDir"*/
@@ -59,7 +66,10 @@ TEST(test4) {
     FILE *fp;
     char **files;
     files = mallocStrArr(3,20);
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
 
     expls(fp, files);
     /*Index of files is: [0] = "..", [1] = "file.txt", [2] = "testDir"*/
@@ -74,7 +84,10 @@ TEST(test5) {
     FILE *fp;
     char **files;
     files = mallocStrArr(3,20);
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
 
     expls(fp, files);
     /*Index of files is: [0] = "..", [1] = "file.txt", [2] = "testDir"*/
@@ -86,9 +99,12 @@ TEST(test5) {
 //Test will compare exppwd PATH to string
 TEST(test6){
     FILE *fp;
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
     //78 is the strlen of all characters exlcuding '\n','\0' etc
-    int isEqual = strncmp(exppwd(fp), PATH, 78);
+    int isEqual = strncmp(exppwd(fp), cwd, 78);
     assertEquals(isEqual, 0);
 }
 
@@ -99,7 +115,10 @@ TEST(test7){
     
     files = mallocStrArr(5, 20);
     system("rm touchExample.txt");
-    chdir(PATH);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/suites/explorer/staticTestDir");
+    chdir(cwd);
     //reload directories contents into files
     touch(newFileName);
     expls(fp,files);
