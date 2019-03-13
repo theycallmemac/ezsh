@@ -9,6 +9,7 @@
 #include "help.h"
 #include "history.h"
 #include "star.h"
+#include "info.h"
 
 
 // Define functions to be loaded into builtinFunc
@@ -16,6 +17,7 @@ int ezshCD(char **args);
 int ezshHELP(char **args);
 int ezshHISTORY(char **args);
 int ezshSTAR(char **args);
+int ezshINFO(char **args);
 int ezshSAVE();
 int ezshEXIT();
 
@@ -27,6 +29,7 @@ char *builtinStr[] = {
     "help",
     "history",
     "star",
+    "info",
     "save",
     "exit"
 };
@@ -39,6 +42,7 @@ int (*builtinFunc[]) (char **) = {
     &ezshHELP,
     &ezshHISTORY,
     &ezshSTAR,
+    &ezshINFO,
     &ezshSAVE,
     &ezshEXIT
 };
@@ -73,6 +77,11 @@ int ezshCD(char **args) {
     return 1;
 }
 
+
+int ezshINFO(char **args) {
+    system("~/.info");
+    return 1;
+}
 
 // ezshSAVE is the function called from prompt.c when you use `save`
 // This makes the shell exit on a zero code
