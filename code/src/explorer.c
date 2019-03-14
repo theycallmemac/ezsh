@@ -28,6 +28,41 @@ void pipeReadprompt(void)
     }
 }
 
+void scrub(WINDOW *win, char **strArr1, char **strArr2){
+    wclear(win);
+    wrefresh(win);
+    free(strArr1);
+    free(strArr2);
+}
+
+void renderHelpScreen(WINDOW *win){
+            clear();
+            refresh();
+            wclear(win);
+            wattron(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 2, 2, "File Explorer:");
+            wattroff(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 4, 2, "-Use the UP and Down Arrows to navigate the FileExplorer");
+            mvwprintw(win, 6, 2, "-Press Enter to open current FileExplorer Option");
+
+            wattron(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 9, 2, "Quick Commands:");
+            wattroff(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 11, 2, "-Use the TAB key to cycle through top menu");
+            mvwprintw(win, 13, 2, "-Press SpaceBar to execute current top menu option");
+            mvwprintw(win, 15, 2, "-Press 'r' to delete a File or Directory");
+
+            wattron(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 18, 2, "Other Keybinds:");
+            wattroff(win, COLOR_PAIR(1) | A_BOLD);
+            mvwprintw(win, 20, 2, "-Press 'f' to force explorer to refresh");
+
+            wattron(win, A_BLINK);
+            mvwprintw(win, 23, 0, "Press 'q' to quit helpscreen");
+            wattroff(win, A_BLINK);
+            wrefresh(win);
+}
+
 void main()
 {
     const int OPTIONS = 15;
@@ -195,10 +230,10 @@ resizeRefresh:
 
         refresh();
         
+        //Checks if the prompt requested the explorer to refresh
         if (REFREQ == 0) {
             REFREQ = 1;
-            wclear(w_exp);
-            wrefresh(w_exp);
+            scrub(w_exp, currdir, display);
             goto loadNewDir;
         }
         switch (ch)
@@ -242,8 +277,7 @@ resizeRefresh:
             break;
 
         case 0x66: //f key
-            wclear(w_exp);
-            wrefresh(w_exp);
+            scrub(w_exp, currdir, display);
             goto loadNewDir;
         case 0x20: //SpaceBar
             if (topOption == 0)
@@ -253,8 +287,7 @@ resizeRefresh:
                 wrefresh(w_command);
                 wattron(w_form, COLOR_PAIR(4));
                 echo();
-                token = strtok(pwd, "\n");
-                strcpy(newDirPath, token);
+                strcpy(newDirPath, pwd);
                 mvwprintw(w_form, 0, 0, "New Directory: ");
                 wgetstr(w_form, newEntry);
                 strcat(newDirPath, "/");
@@ -263,16 +296,13 @@ resizeRefresh:
                 noecho();
                 wclear(w_form);
                 wrefresh(w_form);
-                free(currdir);
-                free(display);
-
+                scrub(w_exp, currdir, display);
                 goto loadNewDir;
             }
             else if (topOption == 1)
             {
                 chdir(changeHome());
-                free(currdir);
-                free(display);
+                scrub(w_exp, currdir, display);
 
                 goto loadNewDir;
             }
@@ -289,12 +319,11 @@ resizeRefresh:
                 noecho();
                 wclear(w_form);
                 wrefresh(w_form);
-                free(currdir);
-                free(display);
+                scrub(w_exp, currdir, display);
 
                 goto loadNewDir;
             }
-        case 0x72:
+        case 0x72: //r key for removing
             token = strtok(display[optionIndex], "\n"); //parsing for expls (removes newline)
             char remF[100];
             char answer[10];
@@ -317,13 +346,11 @@ resizeRefresh:
                 }
                 else
                 {
-                    free(currdir);
-                    free(display);
+                    scrub(w_exp, currdir, display);
 
                     goto loadNewDir;
                 }
-                free(currdir);
-                free(display);
+                scrub(w_exp, currdir, display);
 
                 goto loadNewDir; //Jump to start but load new files
             }
@@ -345,14 +372,12 @@ resizeRefresh:
                 }
                 else
                 {
-                    free(currdir);
-                    free(display);
+                    scrub(w_exp, currdir, display);
 
                     goto loadNewDir;
                 }
             }
-            free(currdir);
-            free(display);
+            scrub(w_exp, currdir, display);
 
             goto loadNewDir; //Jump to start but load new files
 
@@ -362,10 +387,7 @@ resizeRefresh:
             {
                 chdir(display[optionIndex]);
                 //Reset win completely
-                wclear(w_exp);
-                wrefresh(w_exp);
-                free(currdir);
-                free(display);
+                scrub(w_exp, currdir, display);
 
                 goto loadNewDir; //Jump to start but load new files
             }
@@ -380,43 +402,19 @@ resizeRefresh:
             goto resizeRefresh;
 
         case 0x68: // Hex for 'h'; display help screen
-            clear();
-            refresh();
-            wclear(w_help);
-            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 2, 2, "File Explorer:");
-            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 4, 2, "-Use the UP and Down Arrows to navigate the FileExplorer");
-            mvwprintw(w_help, 6, 2, "-Press Enter to open current FileExplorer Option");
-
-            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 9, 2, "Quick Commands:");
-            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 11, 2, "-Use the TAB key to cycle through top menu");
-            mvwprintw(w_help, 13, 2, "-Press SpaceBar to execute current top menu option");
-            mvwprintw(w_help, 15, 2, "-Press 'r' to delete a File or Directory");
-
-            wattron(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 18, 2, "Other Keybinds:");
-            wattroff(w_help, COLOR_PAIR(1) | A_BOLD);
-            mvwprintw(w_help, 20, 2, "-Press 'f' to force explorer to refresh");
-
-            wattron(w_help, A_BLINK);
-            mvwprintw(w_help, 23, 0, "Press 'q' to quit helpscreen");
-            wattroff(w_help, A_BLINK);
-            wrefresh(w_help);
+            refreshHelp:
+            renderHelpScreen(w_help);
             while (ch = wgetch(w_help))
             {
                 if (ch == 0x71)
                 {
-                    /* code */
-                    wclear(w_help);
-                    wrefresh(w_help);
-                    free(currdir);
-                    free(display);
-
+                    scrub(w_exp, currdir, display);
                     goto loadNewDir;
                 }
+                if (KEY_RESIZE) {
+                    goto refreshHelp;
+                }
+                
             }
         }
 
@@ -454,7 +452,7 @@ resizeRefresh:
             }
             else if (topOption == 1)
             {
-                mvwprintw(w_command, 0, 0, "Command: $HOME");
+                mvwprintw(w_command, 0, 0, "Command: cd");
                 wrefresh(w_command);
                 wclear(w_command);
             }
