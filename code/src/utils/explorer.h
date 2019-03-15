@@ -38,7 +38,7 @@ char *exppwd(FILE *fp)
     fp = popen("/bin/pwd", "r");
     char *path = (fgets(pwd, sizeof(pwd) - 1, fp));
     pclose(fp);
-    return (path);
+    return (strtok(path,"\n"));
 }
 
 /*
