@@ -56,9 +56,10 @@ void renderHelpScreen(WINDOW *win){
             mvwprintw(win, 18, 2, "Other Keybinds:");
             wattroff(win, COLOR_PAIR(1) | A_BOLD);
             mvwprintw(win, 20, 2, "-Press 'f' to force explorer to refresh");
+            mvwprintw(win, 22, 2, "-Enter 'info' in the prompt (right hand pane) to see common commands");
 
             wattron(win, A_BLINK);
-            mvwprintw(win, 23, 0, "Press 'q' to quit helpscreen");
+            mvwprintw(win, 25, 0, "Press 'q' to quit helpscreen");
             wattroff(win, A_BLINK);
             wrefresh(win);
 }
