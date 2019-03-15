@@ -8,10 +8,10 @@
 void main()
 {
     char *commands[][10]= {
-                        {"ls", "cd", "touch"},
-                        {"cat", "gedit", "mkdir"},
-                        {"cp", "help", "chmod"},
-                        {"chown", "star", "history"}
+                        {"ls", "cd <dir>", "touch <fileName>"},
+                        {"cat <file>", "gedit <file>", "mkdir <dirName>"},
+                        {"cp <src, destination>", "help <command>", "chmod <0-7,0-7,0-7>"},
+                        {"mv <src, destination>", "star", "history"}
                         };
 
     initscr();
@@ -23,13 +23,13 @@ void main()
     bold_green();
     while(1){
     
-            mvprintw(1, 20, commands[0][0]);
-            mvprintw(3, 20, commands[0][1]);
-            mvprintw(5, 20, commands[0][2]);
+            mvprintw(1, 10, commands[0][0]);
+            mvprintw(3, 10, commands[0][1]);
+            mvprintw(5, 10, commands[0][2]);
 
-            mvprintw(7,  20, commands[1][0]);
-            mvprintw(9,  20, commands[1][1]);
-            mvprintw(11, 20, commands[1][2]);
+            mvprintw(7,  10, commands[1][0]);
+            mvprintw(9,  10, commands[1][1]);
+            mvprintw(11, 10, commands[1][2]);
 
             mvprintw(1, 40, commands[2][0]);
             mvprintw(3, 40, commands[2][1]);

@@ -56,9 +56,10 @@ void renderHelpScreen(WINDOW *win){
             mvwprintw(win, 18, 2, "Other Keybinds:");
             wattroff(win, COLOR_PAIR(1) | A_BOLD);
             mvwprintw(win, 20, 2, "-Press 'f' to force explorer to refresh");
+            mvwprintw(win, 22, 2, "-Enter 'info' in the prompt (right hand pane) to see common commands");
 
             wattron(win, A_BLINK);
-            mvwprintw(win, 23, 0, "Press 'q' to quit helpscreen");
+            mvwprintw(win, 25, 0, "Press 'q' to quit helpscreen");
             wattroff(win, A_BLINK);
             wrefresh(win);
 }
@@ -105,8 +106,8 @@ loadNewDir:
     count = expls(fptr, currdir) - 1;
     w_exp = newwin(count + 2, 100, 3, 1); //Interactive file explorer(Center; left)
     w_command = newwin(2, 30, 0, 21);//Command required to execute(Top; right)
-    w_info = newwin(8, 50, 20, 2);//Info on FE(Bottom; left)
-    w_macros = newwin(3, 20, 0, 3);//QuickCommands(Top; left)
+    w_info = newwin(3, 50, 20, 2);//Info on FE(Bottom; left)
+    w_macros = newwin(1, 20, 0, 3);//QuickCommands(Top; left)
     w_form = newwin(1, 60, 20, 2);//Form for file/dir creation
     w_help = newwin(50, 100, 0, 2);//Help Screen
 
