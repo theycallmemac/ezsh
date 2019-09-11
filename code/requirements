@@ -1,1 +1,1 @@
-sudo apt-get install tmux libreadline-dev libncurses5-dev libncursesw5-dev toilet 
+apt -y install gcc make tmux libreadline-dev libncurses5-dev libncursesw5-dev toilet 
