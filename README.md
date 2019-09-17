@@ -14,6 +14,33 @@ ezsh is dependant on:
 
 ### Installation
 
+#### Docker Installation
+
+If you want to run ezsh in a docker container you can use the `Dockerfile` and `docker-compose.yml` supplied.
+
+- Build with Docker
+    - Docker
+        - When in the `code` directory, use the following command with sudo or as root to build the image:
+            ```
+            docker build -t theycallmemac/ezsh .
+            ```
+        - Next, run the image as a container:
+            ```
+            docker run -d --name ezsh theycallmemac/ezsh
+            ```
+    - docker-compose
+        - When in the `code` directory, use the following command to build and run the container:
+            ```
+            docker-compose up -d
+            ```
+
+- Run with Docker
+To run ezsh in docker run the following command from anywhere on your system with sudo or as root:
+
+```
+docker exec -it ezsh ./ezsh   
+```
+
 #### Installing Compilers and Build Tools
 
 Both the compiler `gcc` and build tool `make` usually come pre-installed with most Linux distributions. In the case they are not you can run:
