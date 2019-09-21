@@ -1,5 +1,9 @@
 # ezsh
 
+<p align="center">
+  <img width="460" height="300" src="https://github.com/theycallmemac/ezsh/blob/master/ezsh-logo.png?raw=true"/>
+</p>
+
 ezsh is a user-friendly, and interactive shell designed to concretise a beginner's view of the terminal and command line.
 
 ### Dependencies
