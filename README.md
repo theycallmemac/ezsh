@@ -6,6 +6,8 @@
 
 ezsh is a user-friendly, and interactive shell designed to concretise a beginner's view of the terminal and command line.
 
+ezsh was designed as part of my third year project in DCU. If you want to have a look at the relevant documents associated with said project please check out [this branch](https://github.com/theycallmemac/ezsh/tree/third-year-project).
+
 ### Dependencies
 
 ezsh is dependant on:
