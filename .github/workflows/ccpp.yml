@@ -1,0 +1,27 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: 
+    - master
+    - 'third-year-project' 
+
+  pull_request:
+    branches:
+    - master
+    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: enable cUnit install script
+      run: chmod +x code/tests/install_CUnit && cd code/tests
+    - name: install cUnit
+      run: ./install_CUnit
+    - name: make tests
+      run: make 
+    - name: run prompt tests
+      run: ./testPrompt
