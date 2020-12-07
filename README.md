@@ -8,6 +8,12 @@ ezsh is a user-friendly, and interactive shell designed to concretise a beginner
 
 ezsh was designed as part of my third year project in DCU. If you want to have a look at the relevant documents associated with said project please check out [this branch](https://github.com/theycallmemac/ezsh/tree/third-year-project).
 
+### Notice
+
+I don't really maintain this. Maybe someday I will decide to remove much of the code and make it more lightweight. 
+
+Built and tested on just Ubuntu, a lot breaks with respect to other Linux distributions. Feel free to try and run it though :D
+
 ### Dependencies
 
 ezsh is dependant on:
